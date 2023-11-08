@@ -14,7 +14,7 @@ void add(int l,int r,LL x){
     for(int i=id[l]+1;i<id[r];i++)b[i]+=x,s[i]+=len*x;
     for(int i=r;id[i]==id[r];i--) a[i]+=x,s[id[r]]+=x;
 }
-
+int lll;
 LL query(int l,int r,LL TT){
     LL ret=0;
     if(id[l]==id[r]) {
