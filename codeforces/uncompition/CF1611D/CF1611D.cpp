@@ -2,7 +2,7 @@
 using namespace std;
 const int maxn=2e5+5;
 
-int T;
+int T,O;
 
 inline int read(){
     int ret=0,f=1;char ch=getchar();
