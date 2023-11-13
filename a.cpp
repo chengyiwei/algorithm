@@ -1,11 +1,30 @@
 #include<bits/stdc++.h>
 using namespace std;
 int main(){
-    double v1,v2,V,a,PI=3.141593;
-        v1=PI*4*4*4*(4/3.0)*1.0;
-        v2=PI*10*10*10*(4/3.0)*1.0;
-        V=v1+v2;
-        a=pow(V,1.0/3);
-        printf("%.4lf",a);
-    return 0;
+    int N;
+    cin>>N;
+    if(N==1){
+        printf("星期一");
+    }
+    else if(N==2){
+        printf("星期二");
+    }
+    else if(N==3){
+        printf("星期三");
+    }
+    else if(N==4){
+        printf("星期四");
+    }
+    else if(N==5){
+        printf("星期五");
+    }
+    else if(N==6){
+        printf("星期六");
+    }
+    else if(N==7){
+        printf("星期日");
+    }
+    else {
+        printf("输入有误");
+    }
 }
