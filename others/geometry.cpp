@@ -23,7 +23,41 @@ bool operator ==(const Point &a,const Point &b){
     return dcmp(a.x-b.x)==0 && dcmp(a.y-b.y)==0;
 }
 
-double Dot(Vector )
+double Dot(Vector A,Vector B) {return A.x*B.x+A.y*B.y;}
+double Length(Vector A) {return sqrt(Dot(A,A));}
+double Angle(Vector A,Vector B) {return acos(Dot(A,B)/Length(A)/Length(B));}
+
+double Cross(Vector A,Vector B) {return A.x*B.y-A.y*B.x;}
+double Area2(Point A,Point B,Point C) {return Cross(B-A,C-A);}
+
+//向量逆时针旋转 rad
+Vector Rotate(Vector A,double rad){return Vector(A.x*cos(rad)-A.y*sin(rad),A.x*sin(rad)+A.y*cos(rad));} //rad是弧度
+
+//求向量的单位法线,调用前判断 A 是不是零向量
+Vector Normal(Vector A){double L=Length(A);return Vector(-A.y/L,A.x/L);}
+
+//求两条直线的交点
+Point GetLineInersection(Point P,Vector v,Point Q,Vector w){
+    Vector u=P-Q;
+    double t=Cross(w,u)/Cross(v,w);
+    return P+v*t;
+}
+
+//点到直线的距离
+double DistanceToLine(Point P,Point A,Point B){
+    Vector v1=B-A,v2=P-A;
+    return fabs(Cross(v1,v2))/Length(v1);
+}
+
+//点到线段的距离
+double DistanceToSegment(Point P,Point A,Point B){
+    if(A==B) return Length(P-A);
+    Vector v1=B-A,v2=P-A,v3=P-B;
+    if(dcmp(Dot(v1,v2))<0) return Length(v2);
+    else if(dcmp(Dot(v1,v3)>0)) return Length(v3);
+    else return fabs(Cross(v1,v2))/Length(v1);
+}
+
 int main(){
 
 }
