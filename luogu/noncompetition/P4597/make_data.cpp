@@ -7,10 +7,10 @@ int brand(){
 int main(){
     freopen("P4597.in","w",stdout);
     srand(GetTickCount());
-    int N=100000;
+    int N=1000;
     printf("%d\n",N);
     for(int i=1;i<=N;i++){
-        int now=brand()%1000000000;
+        int now=1;
         if(rand()&1) now=-now;
         printf("%d ",now);
     }

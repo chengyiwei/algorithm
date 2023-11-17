@@ -1,5 +1,7 @@
 #include<iostream>
+#include<cstdlib>
 #include<ctime>
+#include<windows.h>
 using namespace std;
 bool prime(int n);
 int reverse(int n);
@@ -10,7 +12,7 @@ int main()
 	cout<<"请输入数据个数：";
 	cin>>n;
 	cout<<"随机产生的"<<n<<"个数中的可逆素数有："<<endl;
-	srand(time(NULL));
+	srand(GetTickCount());
 	for(i=1;i<=n;i++)
 	{
 		num=10+rand()%(500-10+1);
@@ -35,7 +37,7 @@ bool prime(int n)                                 //子函数实现素数判定
 }
 int reverse(int n)                                    //子函数实现求反序数
 {
-	int i,num=0;
+	int num=0;
 	while(n>0)
 	{
 		num=num*10+n%10;
