@@ -1,8 +1,8 @@
 #include<bits/stdc++.h>
 using namespace std;
-int temp[2000005]={0};
-long long temp1[2000005]={0};
-long long temp2[2000005]={0};
+const int maxn=5e5+5;
+typedef long long LL;
+int N,Q;
 struct IO{
     static const int S=1<<21;
     char buf[S],*p1,*p2;int st[105],Top;
@@ -24,30 +24,53 @@ struct IO{
         while(st[0]) pc('0'+st[st[0]--]);return *this;
     }
 }fin,fout;
-int main()
-{
-    int n,m;
-    fin>>n>>m;
-    for (int i=1;i<=n;i++)
-    {
-        fin>>temp[i];
-        if (i==1)
-        {
-            temp1[i]=temp[i];
-            temp2[i]=temp[i];
-        }
-        else
-        {
-            temp1[i]=temp1[i-1]+temp[i];
-            temp2[i]=(temp2[i-1]^temp[i]);
-        }
+
+struct Bit{
+    int a[65];
+    Bit(){memset(a,0,sizeof a);}
+    Bit operator +(const Bit B){
+        Bit ret;
+        for(int i=0;i<=60;i++)ret.a[i]=a[i]+B.a[i];
+        return ret;
     }
-    int a,l,r;
-    for (int i=0;i<m;i++)
-    {
-        fin>>a>>l>>r;
-        if (a==1) fout<<temp1[r]-temp1[l-1]<<'\n';
-        else fout<<(temp2[r]^temp2[l-1])<<'\n';
+    Bit operator -(const Bit B){
+        Bit ret;
+        for(int i=0;i<=60;i++)ret.a[i]=a[i]-B.a[i];
+        return ret;
     }
+}d[maxn],s[maxn];
+
+LL PrintBit(Bit x){
+    LL ret=0;
+    for(int i=60;i>=0;i--)
+        ret=(ret<<1)+(x.a[i]!=0);
+    return ret;
+}
+Bit GetBit(LL x){
+    Bit ret;
+    int cnt=0;
+    while(x){
+        ret.a[cnt++]=x&1;
+        x>>=1;
+    }
+    return ret;
+}
+int main(){
+    freopen("C.in","r",stdin);
+    fin>>N;
+    for(int i=1;i<=N;i++){
+        LL now;fin>>now; 
+        if(now<0) 
+            now=0;
+        d[i]=GetBit(now);
+        s[i]=s[i-1]+d[i];
+    }
+    fin>>Q;
+    for(int i=1;i<=Q;i++){
+        int L,R;fin>>L>>R;
+        Bit ans=s[R]-s[L-1];
+        fout<<PrintBit(ans)<<'\n';
+    }
+    
     return 0;
 }
