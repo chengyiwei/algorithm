@@ -1,62 +1,104 @@
-#include<bits/stdc++.h>
+#include <bits/stdc++.h>
+ 
 using namespace std;
-const int maxn=1e5+5,maxe=maxn*2;
-int id[maxn],N,M;
-inline int read(){
-    int ret=0,f=1;char ch=getchar();
-    while(ch<'0'||ch>'9'){if(ch=='-')f=-f;ch=getchar();}
-    while(ch<='9'&&ch>='0')ret=ret*10+ch-'0',ch=getchar();
-    return ret*f;
-}
-struct Link{
-    int x,y;
-}L[maxn];
-struct Query{
-    int L,R,ans,qL,qR,id,num;
-    Query(){ans=0;num=0;}
-    // Query(int L=0,int R=0,int ql=0,int id):L(L),R(R),x(x),id(id){ans=0;}
+ 
+#define sz(x) (int)x.size()
+#define all(x) x.begin(), x.end()
+ 
+struct SegmentTree {
+    int n;
+    vector<vector<int>> tree;
+ 
+    void build(vector<int> &a, int x, int l, int r) {
+        if (l + 1 == r) {
+            tree[x] = {a[l]};
+            return;
+        }
+ 
+        int m = (l + r) / 2;
+        build(a, 2 * x + 1, l, m);
+        build(a, 2 * x + 2, m, r);
+        merge(all(tree[2 * x + 1]), all(tree[2 * x + 2]), back_inserter(tree[x]));
+    }
+ 
+    SegmentTree(vector<int>& a) : n(a.size()) {
+        int SIZE = 1 << (__lg(n) + bool(__builtin_popcount(n) - 1));
+        tree.resize(2 * SIZE - 1);
+        build(a, 0, 0, n);
+    }
+ 
+    int count(int lq, int rq, int mn, int mx, int x, int l, int r) {
+        if (rq <= l || r <= lq) return 0;
+        if (lq <= l && r <= rq) return lower_bound(all(tree[x]), mx) - lower_bound(all(tree[x]), mn);
+ 
+        int m = (l + r) / 2;
+        int a = count(lq, rq, mn, mx, 2 * x + 1, l, m);
+        int b = count(lq, rq, mn, mx, 2 * x + 2, m, r);
+        return a + b;
+    }
+ 
+    int count(int lq, int rq, int mn, int mx) {
+        return count(lq, rq, mn, mx, 0, 0, n);
+    }
 };
-int lnk[maxn],nxt[maxe],son[maxe],cnt;
-inline void add_e(int x,int y){
-    son[++cnt]=y;nxt[cnt]=lnk[x];lnk[x]=cnt;
+ 
+vector<vector<int>> g;
+ 
+vector<int> tin, tout;
+int timer;
+void dfs(int v, int p) {
+    tin[v] = timer++;
+    for (auto u : g[v]) {
+        if (u != p) {
+            dfs(u, v);
+        }
+    }
+    tout[v] = timer;
 }
-
-Query Q[maxn];
-bool vis[maxn];
-int tin[maxn],tout[maxn],timer;
-void dfs(int x,int fa){
-    tin[x]=timer++;
-    for(int j=lnk[x];j;j=nxt[j]){
-        if(son[j]!=fa) dfs(son[j],x);
+ 
+void solve() {
+    int n, q;
+    cin >> n >> q;
+    
+    g.assign(n, vector<int>());
+    for (int i = 0; i < n - 1; i++) {
+        int u, v;
+        cin >> u >> v;
+        u--; v--;
+        g[u].push_back(v);
+        g[v].push_back(u);
     }
-    tout[x]=timer;
+ 
+    timer = 0;
+    tin.resize(n);
+    tout.resize(n);
+    dfs(0, -1);
+    
+    vector<int> p(n);
+    for (int i = 0; i < n; i++) cin >> p[i];
+ 
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) a[i] = tin[p[i] - 1];
+    SegmentTree ST(a);
+ 
+    for (int i = 0; i < q; i++) {
+        int l, r, x;
+        cin >> l >> r >> x;
+        l--; x--;
+        if (ST.count(l, r, tin[x], tout[x])) {
+            cout << "YES\n";
+        } else {
+            cout << "NO\n";
+        }
+    }
 }
-
-// bool cmp(Query A,Query B){
-//     return A.L=
-// }
-void solve(){
-    N=read(),M=read();
-    for(int i=1;i<N;i++){
-        int x=read(),y=read();
-        add_e(x,y);add_e(y,x);
+ 
+int main() {
+    int tests;
+    cin >> tests;
+    while (tests--) {
+        solve();
+        if(tests > 0) cout << "\n";
     }
-    for(int i=1;i<=N;i++){p[i]=read();}
-    dfs(1);
-    for(int i=1;i<=M;i++){
-        int L=read(),R=read(),x=read();
-        Q[i].L=L,Q[i].R=R,Q[i].id=i,Q[i].qL=tin[x],Q[i].R=tout[x];
-    }
-
-    int now_L=0,now_R=0;
-    for(int i=1;i<=M;i++){
-        while(now_L<Q[i].L) del(now_L++);
-    }
-
-}
-int main(){
-    freopen("F.in","r",stdin);
-    int T=read();
-    while(T--) solve();
     return 0;
 }
