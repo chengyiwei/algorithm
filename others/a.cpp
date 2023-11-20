@@ -1,15 +1,14 @@
-#include<stdio.h>
-#include<string.h>
+#include<bits/stdc++.h>
+using namespace std;
+vector<int>st; int a,b,c,d;
 int main()
 {
-    char a[100]="";
-    int i,count=0;
-    gets(a);
-    for(i=0;a[i+1]!='\0';i++)
+    int a,t=0;
+    cin>>a;
+    int w=a/5;
+    for(int i=w;i>=0;i--)
     {
-        if((a[i]!=' '&&a[i+1]==' ')||(a[i]!=' '&&a[i+1]=='\n'))
-            count++;
+        cout<<a/5
     }
-    printf("%d",count);
     return 0;
 }
