@@ -5,7 +5,8 @@ const int maxn=100005;
 int N,a[maxn];
 int L[maxn],R[maxn];
 int main(){
-    freopen("SP1805.in","r",stdin);
+    freopen("A.in","r",stdin);
+    freopen("A.out","w",stdout);
     while(scanf("%d",&N)!=EOF&&N){
         LL ans=0;
         for(int i=1;i<=N;i++) scanf("%d",&a[i]),L[i]=R[i]=i;
