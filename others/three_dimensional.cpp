@@ -58,13 +58,18 @@ double DistanceToSegment(Point3 P,Point3 A,Point3 B){//点P到线段AB的距离
 double Volume6(Point3 A,Point3 B,Point3 C,Point3 D){return Dot(D-A,Cross(B-A,C-A));} //返回AB，AC，AD的混合积。它也等于四面体ABCD的有向面积的6倍
 
 struct Face{
-    int v[3];
+    int v[3]; //v表示三个点的序号
     Vector3 normal(Point3 *P) const{return Cross(P[v[1]]-P[v[0]],P[v[2]]-P[v[0]]);}
     int cansee(Point3 *P,int i) const{return Dot(P[i]-P[v[0]],normal(P))>0?1:0;} //i能不能看到P这个平面
 };
 
+int vis[505][505];
+//没有考虑各种特殊情况(如4点共面，实践中要在表用前堆输入点进行微小扰动)
+double rand01() {return rand()/(double)RAND_MAX;}  
+double randeps() {return (rand01()-0.5)*eps;} //-eps/2到eps/2的随机数
+Point3 add_noise(Point3 p){return Point3(p.x+randeps(),p.y+randeps(),p.z+randeps());}
 vector<Face> CH3D(Point3 *P,int n){
-    vector<Face> cur;
+    vector<Face> cur; //cur表示现在选中在凸包里面的面、
     cur.push_back((Face){{0,1,2}});
     cur.push_back((Face){{2,1,0}});
     for(int i=3;i<n;i++){
@@ -72,14 +77,14 @@ vector<Face> CH3D(Point3 *P,int n){
         for(int j=0;j<cur.size();j++){
             Face& f=cur[j];
             int res=f.cansee(P,i);
-            if(!res) next.push_back(f);
-            for(int k=0;k<3;k++)
+            if(!res) next.push_back(f); //如果不能看见，则不管
+            for(int k=0;k<3;k++) //如果能看见，把这个面的每一条边标记
                 vis[f.v[k]][f.v[(k+1)%3]]=res;
         }
         for(int j=0;j<cur.size();j++)
             for(int k=0;k<3;k++){
                 int a=cur[j].v[k],b=cur[k].v[(k+1)%3];
-                if(vis[a][b]!=vis[b][a]&&vis[a][b])
+                if(vis[a][b]!=vis[b][a]&&vis[a][b])  //如果一个边，只有相邻的一个平面被标记，那么这个边就被选中
                     next.push_back((Face){{a,b,i}});
             }
         cur=next;

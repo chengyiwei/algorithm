@@ -133,7 +133,7 @@ Point GetIntersction(Line a,Line b){//二直线交点，假定交点唯一存在
     return a.P+a.v*t;
 }
 
-int HalfplanIntersection(Line *L,int n,Point* poly){
+int HalfplanIntersection(Line *L,int n,Point* poly){//半平面交
     sort(L,L+n); //按照极角排序
 
     int first,last; //双端队列的第一个元素和最后一个元素的下标
