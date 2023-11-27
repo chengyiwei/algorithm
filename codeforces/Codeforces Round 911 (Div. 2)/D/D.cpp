@@ -13,7 +13,7 @@ int N;
 vector<int> factor[maxn];
 
 void solve(){
-    LL ans=0,pre=0;
+    LL ans=0;
     N=read();
     vector<int> cnt(maxn+1);
     vector<LL> f(maxn+1);
@@ -22,12 +22,12 @@ void solve(){
         a.push_back(read());
     sort(a.begin(),a.end());
     for(int i=0;i<N;i++){
+        LL now=0;
         int x=a[i];
-        ans+=pre;
         for(int k=factor[x].size()-1;k>=0;k--){
             int t=factor[x][k];
             f[t]+=cnt[t];
-            pre+=t*f[t];
+            now+=t*f[t];
             for(auto tt:factor[t])
                 f[tt]-=f[t];
         }
@@ -35,6 +35,7 @@ void solve(){
             cnt[t]+=1;
             f[t]=0;
         }
+        ans+=now*(N-i-1);
     }
     cout<<ans<<'\n';
     return ;
