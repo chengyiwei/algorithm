@@ -8,34 +8,43 @@ inline int read(){
     return ret*f;
 }
 
-const int maxn=105;
-int a[maxn];
-LL num[maxn],up[maxn];
-LL g[maxn],sum_p[maxn];
+const int maxn=1e5+5;
+int N;
+vector<int> factor[maxn];
+
 void solve(){
-    int N=read(),top=0;
-    LL ans=0;
-    for(int i=1;i<=N;i++) {a[i]=read(),num[a[i]]++;top=max(top,a[i]);}
-    for(int i=top;i;i--)    
-        up[i]=up[i+1]+num[i];
-    for(int k=top;k;k--){
-        for(int i=1;i*k<=top;i++)
-        for(int j=i+1;j*k<=top;j++){
-            if(__gcd(i,j)!=1)continue;
-            g[k]+=k*num[i*k]*num[j*k]*(up[j*k]);
+    LL ans=0,pre=0;
+    N=read();
+    vector<int> cnt(maxn+1);
+    vector<LL> f(maxn+1);
+    vector<int> a;
+    for(int i=1;i<=N;i++) 
+        a.push_back(read());
+    sort(a.begin(),a.end());
+    for(int i=0;i<N;i++){
+        int x=a[i];
+        ans+=pre;
+        for(int k=factor[x].size()-1;k>=0;k--){
+            int t=factor[x][k];
+            f[t]+=cnt[t];
+            pre+=t*f[t];
+            for(auto tt:factor[t])
+                f[tt]-=f[t];
         }
-        g[k]+=(num[k]-1)*(num[k])/2*up[k];
-        // for(int j=2;j*k<=top;j++)
-        //     g[k]-=g[j*k];
+        for(auto t:factor[x]){
+            cnt[t]+=1;
+            f[t]=0;
+        }
     }
-    for(int k=1;k<=top;k++){
-        ans+=g[k];
-    }
-    printf("%lld\n",ans);
+    cout<<ans<<'\n';
     return ;
 }
+
 int main(){
     freopen("D.in","r",stdin);
+    for(int i=1;i<maxn;i++)
+        for(int j=i;j<maxn;j+=i)
+            factor[j].push_back(i);
     int T=read();
     while(T--) solve();
 }
