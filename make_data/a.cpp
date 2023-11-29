@@ -1,25 +1,18 @@
 #include<bits/stdc++.h>
 using namespace std;
-const int maxn=5005;
-int N;
-double F[maxn][maxn]; //F[i][k] 表示前 i 个数字，已经选了 k 个最大值
-double sumk[maxn],a[maxn];
 int main(){
     string P="1";
     freopen((P+".in").c_str(),"r",stdin);
     freopen((P+".out").c_str(),"w",stdout);
-    cin>>N;
-    for(int i=1;i<=N;i++) cin>>a[i];
-    for(int i=1;i<=N;i++)
-    for(int k=1;k<=i;k++){
-        F[i][k]=max(F[i-1][k],F[i-1][k-1]*0.9+a[i]);
+    int N;
+    scanf("%d",&N);getchar();
+    char lst='0',now;
+    for(int i=1;i<=N;i++){
+        now=getchar();
+        a[i]=now;
+        if((now=='a'&&lst=='b')||(lst=='a'&&now=='b')) {printf("Yes\n");return 0;}
+        lst=now;
     }
-    double ans=-1000000;
-    for(int k=1;k<=N;k++){
-        sumk[k]=sumk[k-1]*0.9+1;
-        double now=F[N][k]*1.0/sumk[k]-1200.0/sqrt(k);
-        ans=max(ans,now);
-    }
-    printf("%.10lf",ans);
+    printf("No");
     return 0;
 }
