@@ -1,18 +1,22 @@
 #include<bits/stdc++.h>
 using namespace std;
+typedef long long LL;
+const int maxn=2e6+5;
+LL a[maxn],tot,ans=2e12+10;
 int main(){
-    string P="1";
+    string P="a";
     freopen((P+".in").c_str(),"r",stdin);
     freopen((P+".out").c_str(),"w",stdout);
-    int N;
-    scanf("%d",&N);getchar();
-    char lst='0',now;
-    for(int i=1;i<=N;i++){
-        now=getchar();
-        a[i]=now;
-        if((now=='a'&&lst=='b')||(lst=='a'&&now=='b')) {printf("Yes\n");return 0;}
-        lst=now;
+    LL D;
+    cin>>D;
+    for(LL i=0;i*i<=D;i++)
+        a[++tot]=i*i;
+    LL pos=tot;
+    for(int i=1;i<=tot;i++){ //D-(x2+y2)
+        while(pos>0&&a[pos]+a[i]>D) pos--;
+        if(pos<tot) ans=min(ans,a[pos+1]+a[i]-D);
+        if(pos>0) ans=min(ans,D-(a[pos]+a[i]));
     }
-    printf("No");
+    printf("%lld\n",ans);
     return 0;
 }

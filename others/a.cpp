@@ -3,7 +3,7 @@ using namespace std;
 typedef long long LL;
 const LL TT=1e9+7;
 
-
+int p(int x);
 inline int read(){
     int ret=0,f=1;char ch=getchar();
     while(ch<'0'||ch>'9'){if(ch=='-')f=-f;ch=getchar();}
@@ -15,4 +15,7 @@ int main() {
     cin>>N;
     cout<<(2*N*N-N+1)%TT<<endl;
     return 0;
+}
+int p(int x){
+    int s;
 }
