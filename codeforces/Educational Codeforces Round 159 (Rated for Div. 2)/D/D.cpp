@@ -15,18 +15,21 @@ pii pos[maxn];
 
 void check(){
     int x=read(),y=read(),l=read(),r=read();
-    for(auto& e:mp[make_pair(x,y)]){
-        if(!(l<=e&&e<r)) {printf("YES\n");return ;}
-    }
     int x_=pos[r].first-x+pos[l-1].first,y_=pos[r].second-y+pos[l-1].second;
-    for(auto& e:mp[make_pair(x_,y_)]){
-        if((l<=e&&e<r)) {printf("YES\n");return ;}
-    }
-    printf("NO\n");
 
+    auto& now1=mp[make_pair(x,y)];
+    if(now1.size()>0){
+        if(now1[0]<l||now1[now1.size()-1]>=r) {printf("YES\n");return ;}
+    }
+    auto& now2=mp[make_pair(x_,y_)];
+    int pos_L=distance(now2.begin(),lower_bound(now2.begin(),now2.end(),l));
+    if(pos_L<now2.size()&&now2[pos_L]<r) {printf("YES\n");return ;}
+
+    printf("NO\n");
 }
 int main(){
     freopen("D.in","r",stdin);
+    freopen("D.out","w",stdout);
     int N=read(),Q=read();
     for(int i=1;i<=N;i++)
         s[i]=getchar();
