@@ -1,6 +1,7 @@
 #include<bits/stdc++.h>
+#define int long long
 using namespace std;
-const int maxn=15,INF=1<<30;
+const int maxn=205,INF=1<<30;
 
 struct Edge{
     int from,to,cap,flow;
@@ -57,8 +58,8 @@ struct EdmondsKarp{
     }
 };
 
-int main(){
-    freopen("")
+signed main(){
+    freopen("P3376.in","r",stdin);
     int N,M,S,T;
     scanf("%d%d%d%d",&N,&M,&S,&T);
     EdmondsKarp A;
@@ -68,6 +69,6 @@ int main(){
         scanf("%d%d%d",&x,&y,&w);
         A.add_e(x,y,w);
     }
-    printf("%d\n",A.Maxflow(S,T));
+    printf("%lld\n",A.Maxflow(S,T));
     return 0;
 }
