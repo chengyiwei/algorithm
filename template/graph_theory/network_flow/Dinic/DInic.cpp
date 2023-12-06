@@ -47,7 +47,7 @@ struct Dinic{
     }
 
     int DFS(int x,int a){ //a表示当前流到这个节点的流
-        if(x=t||a==0) return a;
+        if(x==t||a==0) return a;
         int flow=0,f;
         for(int& i=cur[x];i<G[x].size();i++){ //当前弧优化
             Edge& e=edges[G[x][i]];
