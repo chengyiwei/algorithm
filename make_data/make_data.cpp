@@ -1,32 +1,23 @@
 #include<bits/stdc++.h>
 #include<windows.h>
 using namespace std;
-typedef long long LL;
-LL brand(){
+int brand(){
     return (rand()<<16)+(rand()<<1)+(rand()<<1);
 }
-LL bbrand(){
-    return (brand()<<31)+(rand());
-}
-LL a[(int)1e6+5];
-bool solve(LL D){
-    int tot=0;
-    for(LL i=0;i*i<=D;i++)
-        a[++tot]=i*i;
-    LL pos=tot,ans=1e9;
-    for(int i=1;i<=tot;i++){ //D-(x2+y2)
-        while(pos>0&&a[pos]+a[i]>D) pos--;
-        if(pos<tot) ans=min(ans,a[pos+1]+a[i]-D);
-        if(pos>0) ans=min(ans,D-(a[pos]+a[i]));
-    }
-    // printf("%lld\n",ans);
-    return ans<=15;
-}
+typedef pair<int,int> pii;
+map<pii,bool> mp;
 int main(){
     freopen("a.in","w",stdout);
     srand(GetTickCount());
-    LL x=bbrand()%1000000000000;
-    while(solve(x)) 
-        x=bbrand()%1000000000000;
-    cout<<x<<endl;
+    int n=100,m=3000;
+    printf("%d %d\n",n,m);
+    for(int i=1;i<=m;i++){
+        int x=brand()%n+1,y=brand()%n+1;
+        while(mp[make_pair(x,y)]){
+            x=brand()%n+1,y=brand()%n+1;
+        }
+        mp[make_pair(x,y)]=1;
+        mp[make_pair(y,x)]=1;
+        printf("%d %d %d\n",x,y,brand()%1000000000);
+    }
 }

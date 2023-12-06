@@ -49,5 +49,4 @@ int main(){
         if(N==0&&M==0) break;
         solve();
     }
-
 }
