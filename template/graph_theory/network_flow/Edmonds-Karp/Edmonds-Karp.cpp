@@ -15,6 +15,7 @@ struct EdmondsKarp{
     int p[maxn];
 
     void init(int n){
+        this->n=n;
         for(int i=0;i<n;i++) G[i].clear();
         edges.clear();
     }

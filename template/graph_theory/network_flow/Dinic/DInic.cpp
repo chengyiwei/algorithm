@@ -1,13 +1,11 @@
 #include<bits/stdc++.h>
-#define int long long
 using namespace std;
-const int maxn=205,INF=1ll<<40;
-
+const int maxn=15;
+const int INF=1<<30;
 struct Edge{
     int from,to,cap,flow;
     Edge(int u,int v,int c,int f):from(u),to(v),cap(c),flow(f){}
 };
-
 struct Dinic{
     int n,m,s,t;
     vector<Edge> edges;
@@ -49,7 +47,7 @@ struct Dinic{
     }
 
     int DFS(int x,int a){ //a表示当前流到这个节点的流
-        if(x==t||a==0) return a;
+        if(x=t||a==0) return a;
         int flow=0,f;
         for(int& i=cur[x];i<G[x].size();i++){ //当前弧优化
             Edge& e=edges[G[x][i]];
@@ -74,18 +72,4 @@ struct Dinic{
         return flow;
     }
 };
-
-signed main(){
-    freopen("P3376.in","r",stdin);
-    int N,M,S,T;
-    scanf("%lld%lld%lld%lld",&N,&M,&S,&T);
-    Dinic A;
-    A.init(N);
-    for(int i=1;i<=M;i++){
-        int x,y,w;
-        scanf("%lld%lld%lld",&x,&y,&w);
-        A.add_e(x,y,w);
-    }
-    printf("%lld\n",A.Maxflow(S,T));
-    return 0;
-}
+int main(){}

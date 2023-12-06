@@ -1,7 +1,14 @@
 #include<bits/stdc++.h>
 using namespace std;
 typedef long long LL;
-const int maxn=15,INF=1<<30;
+const int maxn=5005,INF=1<<30;
+
+inline int read(){
+    int ret=0,f=1;char ch=getchar();
+    while(ch<'0'||ch>'9'){if(ch=='-')f=-f;ch=getchar();}
+    while(ch<='9'&&ch>='0')ret=ret*10+ch-'0',ch=getchar();
+    return ret*f;
+}
 
 struct Edge{
     int from,to,cap,flow,cost;
@@ -32,16 +39,16 @@ struct EdmondsKarp{
     }
 
     bool BellmanFord(int s,int t,int& flow,LL& cost){
-        for(int i=0;i<n;i++)dis[i]=INF;
+        for(int i=1;i<=n;i++)dis[i]=INF;
         memset(vis,0,sizeof vis);
         queue<int> Q;
-        Q.push(s);
+        Q.push(s);dis[s]=0;vis[s]=1;a[s]=INF;
         while(!Q.empty()){
             int u=Q.front();Q.pop();
             vis[u]=0;
             for(int i=0;i<G[u].size();i++){
                 Edge& e=edges[G[u][i]];
-                if(e.cap>e.flow&&dis[e.to]>dis[u]+e.cost){
+                if(e.cap-e.flow>0&&dis[e.to]>dis[u]+e.cost){
                     dis[e.to]=dis[u]+e.cost;
                     p[e.to]=G[u][i];
                     a[e.to]=min(a[u],e.cap-e.flow);
@@ -66,4 +73,18 @@ struct EdmondsKarp{
     }
 };
 
-int main(){}
+int main(){
+    freopen("P3381.in","r",stdin);
+    int n,m,s,t;
+    n=read();m=read();s=read();t=read();
+    EdmondsKarp A;
+    A.init(n);
+    for(int i=0;i<m;i++){
+        int x=read(),y=read(),c=read(),w=read();
+        A.add_e(x,y,c,w);
+    }
+    LL cost=0;
+    cout<< A.MincostMaxflow(s,t,cost) ;
+    cout<<" "<<cost<<endl;
+    return 0;
+}
