@@ -15,14 +15,17 @@ struct Edge{
     Edge(int u,int v,int c,int f,int w):from(u),to(v),cap(c),flow(f),cost(w){}
 };
 
-struct EdmondsKarp{
-    int n,m;
+
+
+struct Dinic{
+    int n,m,s,t;
     vector<Edge> edges;
     vector<int> G[maxn];
     int vis[maxn];
     int dis[maxn];
     int a[maxn];  //起点到 i 的可改进量
-    int p[maxn];
+    int cur[maxn]; //当前弧
+    
 
     void init(int n){
         this->n=n;
@@ -38,7 +41,7 @@ struct EdmondsKarp{
         G[to].push_back(m-1);
     }
 
-    bool BellmanFord(int s,int t,int& flow,LL& cost){
+    bool SPFA(){
         for(int i=1;i<=n;i++)dis[i]=INF;
         memset(vis,0,sizeof vis);
         queue<int> Q;
@@ -50,25 +53,42 @@ struct EdmondsKarp{
                 Edge& e=edges[G[u][i]];
                 if(e.cap-e.flow>0&&dis[e.to]>dis[u]+e.cost){
                     dis[e.to]=dis[u]+e.cost;
-                    p[e.to]=G[u][i];
                     a[e.to]=min(a[u],e.cap-e.flow);
                     if(!vis[e.to]){Q.push(e.to);vis[e.to]=1;}
                 }
             }
         }
         if(dis[t]==INF) return false;
-        flow+=a[t];
-        cost+=(LL)dis[t]*(LL)a[t];
-        for(int u=t;u!=s;u=edges[p[u]].from){
-            edges[p[u]].flow+=a[t];
-            edges[p[u]^1].flow-=a[t];
-        }
         return true;
+    }
+    
+    int DFS(int u,int a){
+        if(a==0||u==t) return a;
+        vis[u]=1;
+        int flow=0,cost=0,f;
+        for(int& i=cur[u];i<G[u].size();i++){
+            Edge &e=edges[G[u][i]];
+            if(!vis[e.to] && dis[u]+e.cost==dis[e.to]&&(f=DFS(e.to,min(a,e.cap-e.flow)))>0){
+                e.flow+=f;
+                edges[G[u][i]^1].flow-=f;
+                flow+=f;
+                a-=f;
+                if(a==0)break;
+            }
+        }
+        return flow;
     }
 
     int MincostMaxflow(int s,int t,LL& cost){
-        int flow=0;cost=0;
-        while(BellmanFord(s,t,flow,cost));
+        this->s=s,this->t=t;
+        int flow=0;
+        while(SPFA()){
+            memset(vis,0,sizeof vis);
+            memset(cur,0,sizeof cur);
+            int now_flow=DFS(s,INF);
+            flow+=now_flow;
+            cost+=dis[t]*now_flow;
+        }
         return flow;
     }
 };
@@ -77,7 +97,7 @@ int main(){
     freopen("P3381.in","r",stdin);
     int n,m,s,t;
     n=read();m=read();s=read();t=read();
-    EdmondsKarp A;
+    Dinic A;
     A.init(n);
     for(int i=0;i<m;i++){
         int x=read(),y=read(),c=read(),w=read();

@@ -1,13 +1,26 @@
-#pragma GCC optimize(2)
-#include<bits/stdc++.h>
-using namespace std;
-long long n,L=1;
+#include<stdio.h>
 int main(){
-    cin>>n;
-    for(long i=1;i<=n*2;i++){
-        L+=i;
+    int n,m;
+    scanf("%d\n",&n);
+    int b[n][2];
+    char a[n][17];
+    for(int i=0;i<n;i++){
+        for(int j=0;j<16;j++){
+        	scanf("%c",&a[i][j]);
+		}
+		scanf("%d %d\n",&b[i][0],&b[i][1]);
     }
-    cout<<(L-n*2)%1000000007<<endl;
-    
-    return 0;
+    scanf("%d",&m);
+    for(int i=0;i<m;i++){
+    	int t;
+    	scanf("%d",&t);
+    	for(int j=0;j<n;j++){
+    		if(b[j][0]==t){
+    			for(int k=0;k<16;k++){
+    				printf("%c",a[j][k]);
+				}
+				printf(" %d\n",b[j][1]);
+			}
+		}
+	}
 }

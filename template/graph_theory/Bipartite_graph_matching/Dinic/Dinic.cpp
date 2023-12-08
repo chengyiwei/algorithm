@@ -72,19 +72,4 @@ struct Dinic{
         return flow;
     }
 };
-int main(){
-    freopen("Dinic.in","r",stdin);
-    int n,m,e;
-    Dinic F;
-    F.init(n+m+2);
-    int st=n+m+1,ed=n+m+2;
-    for(int i=1;i<=e;i++){
-        int x,y;scanf("%d%d",&x,&y);
-        F.add_e(x,y+n,1);
-    }
-    for(int i=1;i<=n;i++)
-        F.add_e(st,i,1);
-    for(int i=1;i<=m;i++)
-        F.add_e(i+n,ed,1);
-    printf("%d\n",F.Maxflow(st,ed));
-}
+int main(){}
