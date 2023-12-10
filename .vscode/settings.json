@@ -94,7 +94,8 @@
         "thread": "cpp",
         "typeinfo": "cpp",
         "valarray": "cpp",
-        "stdlib.h": "c"
+        "stdlib.h": "c",
+        "hash_map": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled",
 }
