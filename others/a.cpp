@@ -1,31 +1,18 @@
 #include<bits/stdc++.h>
 using namespace std;
-typedef long long ll;
-ll mp[1005];
-ll p[1005];
-vector<int> q;
-ll n, t, x, a, ans;
-int main()
-{
-    ios::sync_with_stdio(false);
-    cin >> n >> t;
-    q.resize(1e9);
-    while(n --)
-    {
-        cin >> x >> a;
-        x <<= 1;
-        for(int i = x - a - t + 1; i <= x + a + t - 1; i ++)
-        {
-//			cout << i << " ";
-            mp[i] = 1;
+int main(){
+    int T;
+    scanf("%d%*c",&T);//%*c表示读入一个字符但不赋值
+    string s[1000],now_s;
+    for(int i=1;i<=T;i++)
+        getline(cin,s[i]);
+    getline(cin,now_s);
+    for(int i=1;i<=T;i++){
+        if(now_s==s[i]){
+            printf("%d\n",i);
+            return 0;
         }
-//        cout << endl;
-//        cout << x - a - t << " " << x + a + t << endl; 
-        p[x - a - t] = 1;
-        p[x + a + t] = 1;
     }
-    for(int i = -6000; i <= 6000; i ++)
-        if(p[i] && !mp[i]) ans ++;
-    cout << ans << endl;
+    printf("-1\n");
     return 0;
 }
