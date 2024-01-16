@@ -1,161 +1,118 @@
 #include<bits/stdc++.h>
 using namespace std;
+const int MAXN=1e6+10;
 
-struct Node{
-    int lson,rson;
-    int val,siz,tsiz,fa;  //子树大小。正式子树大小
-    int real; //真实
-    Node(){
-        lson=rson=0;
-        val=siz=tsiz=fa=0;
-        real=1;
-    }
-};
-
-struct BST{
+struct Treap{
+    int cnt=0,root=0;
+    struct Node{
+        int ls,rs; //左儿子，右儿子
+        int val,pri; //键值，优先级 ，小根堆
+        int siz; //子树大小
+        Node(int v=0,int p=0):val(v),pri(p),siz(1),ls(0),rs(0){}
+    };
     vector<Node> t;
-    vector<int> order;
-    const double aplpha=0.75; //平衡因子
-    int root=0,tot=0,rb=0;
-
-    BST(int n){
+    Treap(int n) {
         t.assign(n+1,Node());
+        t[0].siz=0;
     }
 
-    bool isbad(int u){ //判断平衡
-        if((double)t[u].tsiz*aplpha < (double)max(t[t[u].lson].tsiz,t[t[u].rson].tsiz)) return true;
-        return false;
-    }
-    
-    void insert(int& u,int val){
-        if(!u){
-            u=++tot;
-            t[u].val=val;
-            t[u].siz=t[u].tsiz=t[u].real=1;
-            t[u].lson=t[u].rson=0;
-            return ;
+    void update(int x){t[x].siz=t[t[x].ls].siz+t[t[x].rs].siz+1;}
+
+    void rotate(int &x,int d){ // d=0 右旋，d=1左旋
+        int k;
+        if(d==1){
+            k=t[x].rs;
+            t[x].rs=t[k].ls;
+            t[k].ls=x;
         }
-        t[u].siz++;t[u].tsiz++;
-        if(val<=t[u].val) insert(t[u].lson,val);
-        else insert(t[u].rson,val);
-        if(isbad(u)) rebuild(u);
+        else{
+            k=t[x].ls;
+            t[x].ls=t[k].rs;
+            t[k].rs=x;
+        }
+        t[k].siz=t[x].siz;
+        update(x);
+        x=k;
     }
 
-    int kth(int k){
-        for(int u=root;u;){
-            if(t[u].real&&t[t[u].lson].tsiz+1==k) 
-                return t[u].val;
-            if(t[t[u].lson].tsiz>=k) 
-                u=t[u].lson;
-            else 
-                k-=t[t[u].lson].tsiz+t[u].real,
-                u=t[u].rson;
+    void insert(int &x,int val){
+        if(!x){++cnt;x=cnt;t[x]=Node(val,rand());return ;}
+        t[x].siz++;
+        if(val <= t[x].val){
+            insert(t[x].ls,val);
+            if(t[t[x].ls].pri < t[x].pri) rotate(x,0);
         }
-        return 0;    
+        else{
+            insert(t[x].rs,val);
+            if(t[t[x].rs].pri > t[x].pri) rotate(x,1);
+        }
+        update(x);
     }
 
-    int rank(int val){ //返回值 val 的排名
-        int ans=1;
-        for(int u=root;u;){
-            if(val<=t[u].val)
-                u=t[u].lson;
-            else 
-                ans+=t[t[u].lson].tsiz+t[u].real,
-                u=t[u].rson;
+    void del(int &x,int val){
+        t[x].siz--;
+        if(val == t[x].val){
+            if(t[x].ls==0 && t[x].rs==0) {x=0;return ;} //叶子节点，直接删除
+            if(t[x].ls==0 || t[x].rs==0) {x=t[x].ls+t[x].rs;return ;} //只有一个儿子，直接删除
+            if(t[t[x].ls].pri < t[t[x].rs].pri) { 
+                rotate(x,0),del(t[x].rs,val);return ;
+            }
+            else {
+                rotate(x,1),del(t[x].ls,val);return ;
+            }
         }
-        return ans;
-    }
-
-    void pop_rk(int &u,int rk){  //删除排名为 rk 的节点
-        if(t[u].real&&t[t[u].lson].tsiz+1==rk){ //找到了
-            t[u].real=0;
-            t[u].tsiz--;
-            return ;
-        }
-        t[u].tsiz--;
-        if(t[t[u].lson].tsiz+t[u].real>=rk) //在左子树
-            pop_rk(t[u].lson,rk);
+        if(val <= t[x].val) 
+            del(t[x].ls,val);
         else 
-            pop_rk(t[u].rson,rk-(t[t[u].lson].tsiz+t[u].real));
+            del(t[x].rs,val);
+        update(x);
     }
 
-    void pop(int val){  //删除值为 val 的节点
-        pop_rk(root,rank(val)); //先找到排名
-        if(1.0*t[root].siz*aplpha > 1.0*t[root].tsiz)  //如果无用节点过多，重建
-            rebuild(root);
+    int rank(int x,int val) { // val 的排名
+        if(x==0) return 0;
+        if(val <= t[x].val) return rank(t[x].ls,val);
+        else return t[t[x].ls].siz+1+rank(t[x].rs,val);
     }
 
-    void dfs(int u){
-        if(!u) return ;
-        dfs(t[u].lson);
-        if(t[u].real) order.push_back(u);
-        dfs(t[u].rson);
+    int kth(int x,int k){ // 排名为 k 的值
+        if(k==t[t[x].ls].siz+1) return t[x].val;
+        if(k <= t[t[x].ls].siz) return kth(t[x].ls,k);  //在左子树
+        else return kth(t[x].rs,k-t[t[x].ls].siz-1);
     }
 
-    void build(int &u,int l,int r,int fa=0){
-        int mid=(l+r)>>1;
-        u=order[mid];
-        t[u].fa=fa;
-        if(l==r){
-            t[u].lson=t[u].rson=0;
-            t[u].siz=t[u].tsiz=1;
-            return ;
-        }
-        if(l<mid) 
-            build(t[u].lson,l,mid-1,u);
-        else 
-            t[u].lson=0;
-        if(r>mid) 
-            build(t[u].rson,mid+1,r,u);
-        else 
-            t[u].rson=0;
-        t[u].siz=t[t[u].lson].siz+t[t[u].rson].siz+1;
-        t[u].tsiz=t[t[u].lson].tsiz+t[t[u].rson].tsiz+t[u].real;
+    int pre(int x,int val){ //val 的前驱
+        if(x==0) return 0;
+        if(val <= t[x].val) return pre(t[x].ls,val);
+        int tmp=pre(t[x].rs,val);
+        if(tmp==0) return t[x].val;
+        else return tmp;
     }
 
-    void rebuild(int &u){
-        order.assign(1,0);
-        dfs(u);
-        if(order.size()!=1) //没有新的元素
-            build(u,1,order.size()-1,t[u].fa);
-        else
-            u=0;
+    int nxt(int x,int val){ //val 的后继
+        if(x==0) return 0;
+        if(val >= t[x].val) return nxt(t[x].rs,val);
+        int tmp=nxt(t[x].ls,val);
+        if(tmp==0) return t[x].val;
+        else return tmp;
     }
-
 };
+
 
 int main(){
-    // freopen("P3369.in","r",stdin);
-    // freopen("P3369.out","w",stdout);
+    freopen("P3369.in","r",stdin);
+    freopen("P33690.out","w",stdout);
+    srand(time(0));
     int Q; scanf("%d",&Q);
-    BST T(Q);
+    Treap T(Q);     
     int op,x;
     while(Q--){
         scanf("%d%d",&op,&x);
-        if(op==1){
-            T.insert(T.root,x);
-            // if(T.rb) { //重建
-            //     if(T.rb==T.root) T.rebuild(T.root);
-            //     else if(T.rb==T.t[T.t[T.rb].fa].lson) T.rebuild(T.t[T.t[T.rb].fa].lson);
-            //     else T.rebuild(T.t[T.t[T.rb].fa].rson);
-            //     T.rb=0;
-            // }
-        }
-        if(op==2){
-            T.pop(x);
-        }
-        if(op==3){
-            printf("%d\n",T.rank(x));
-        }
-        if(op==4){
-            printf("%d\n",T.kth(x));
-        }
-        if(op==5){
-            printf("%d\n",T.kth(T.rank(x)-1));
-        }
-        if(op==6){
-            printf("%d\n",T.kth(T.rank(x+1)));
-        }
+        if(op==1) T.insert(T.root,x);
+        if(op==2) T.del(T.root,x);
+        if(op==3) printf("%d\n",T.rank(T.root,x)+1);
+        if(op==4) printf("%d\n",T.kth(T.root,x));
+        if(op==5) printf("%d\n",T.pre(T.root,x));
+        if(op==6) printf("%d\n",T.nxt(T.root,x));
     }
     return 0;
 }

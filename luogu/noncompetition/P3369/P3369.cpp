@@ -19,7 +19,7 @@ struct BST{
     int root=0,tot=0,rb=0;
 
     BST(int n){
-        t.assign(1,Node());
+        t.assign(n+1,Node());
     }
 
     bool isbad(int u){ //判断平衡
@@ -29,7 +29,6 @@ struct BST{
     
     void insert(int& u,int val){
         if(!u){
-            t.push_back(Node());
             u=++tot;
             t[u].val=val;
             t[u].siz=t[u].tsiz=t[u].real=1;
