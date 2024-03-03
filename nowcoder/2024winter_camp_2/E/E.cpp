@@ -30,7 +30,7 @@ void solve(){
 
 int main(){
     freopen("E.in","r",stdin);
-    int T; scanf("%d",&T);
+    int T = 1;
     while(T--) solve();
     return 0;
 }
