@@ -7,9 +7,8 @@ int main() {
         vector<int> p;
         for (int j = 1; j <= n; j++) {
             int x; cin >> x;
-            if (x) p.push_back(j);
+            if (x == 1) cout << x << " ";
         }
-        for (auto x : p) cout << x << " ";
         cout << '\n';
     }
     return 0;

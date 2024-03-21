@@ -1,33 +1,49 @@
-#include<bits/stdc++.h>
+#include <bits/stdc++.h>
 using namespace std;
-const int maxn=4e6+105,INF=1<<30;
-int N,M,max_T,G[maxn],S[maxn],F[maxn],hed=1,til=0,Q[maxn],ans=INF;
-inline int read(){
-	int ret=0,f=1;char ch=getchar();
-	while(ch<'0'||ch>'9'){if(ch=='-')f=-f;ch=getchar();}
-	while(ch<='9'&&ch>='0')ret=ret*10+ch-'0',ch=getchar();
-	return ret*f;
-}
-inline int X(int j){return G[j];}
-inline int Y(int j){return F[j]+S[j];}
-inline long double calc(int i,int j){return X(i)==X(j)?(Y(j)>Y(i)?INF:-INF):((long double)(Y(i)-Y(j))/(X(i)-X(j)));}
-int main(){
-	N=read();M=read();
-	for(int i=1;i<=N;i++){
-		int now_T=read();
-		G[now_T]++;S[now_T]+=now_T;max_T=max(max_T,now_T);
-	}
-	for(int i=1;i<M+max_T;i++)G[i]+=G[i-1],S[i]+=S[i-1];
-	for(int i=0;i<M;i++)F[i]=G[i]*i-S[i];
-	Q[++til]=0;
-	for(int i=M;i<max_T+M;i++){
-		while(hed<til&&calc(Q[hed],Q[hed+1])<=i)++hed;
-		int j=Q[hed];
-		F[i]=F[j]+(G[i]-G[j])*i-(S[i]-S[j]);
-		while(hed<til&&calc(Q[til-1],Q[til])>=calc(Q[til-1],i-M+1))--til;
-		Q[++til]=i-M+1;
-	}
-	for(int i=max_T;i<max_T+M;i++)ans=min(ans,F[i]);
-	printf("%d\n",ans);
-	return 0;
+
+const int INF = 0x3f3f3f3f;
+
+int main() {
+    int n, m; cin >> n >> m;
+    vector<int> t(n + 1, 0);
+    for (int i = 1; i <= n; i++) 
+        cin >> t[i];
+    sort (t.begin() + 1, t.end());
+    
+    int max_t = t.back() + m;
+    vector<int> g(max_t + 1, 0), s(max_t + 1, 0), dp (max_t + 1, INF);
+    for (int i = 1; i <= n; i++) 
+        g[t[i]] += 1, s[t[i]] += t[i];
+    for (int i = 1; i <= max_t; i++) 
+        g[i] += g[i - 1], s[i] += s[i - 1];
+    
+    auto x = [&](int j) {return g[j];};
+    auto y = [&](int j) {return dp[j] + s[j];};
+    auto slope = [&](int i, int j) {
+        if (x(i) == x(j)) return y(j) > y(i) ? 1.0 * INF : -1.0 * INF;
+        return 1.0 * (y(i) - y(j)) / (x(i) - x(j));
+    };
+
+    for (int i = 0; i < m; i++)
+        dp[i] = g[i] * i - s[i];
+    
+    deque <int> q; q.push_back(0);
+    for (int i = m; i <= max_t; i++) {
+        while (q.size() >= 2 && slope(q[q.size() - 2], q[q.size() - 1]) >= slope(q[q.size() - 1], i - m))
+            q.pop_back();
+        q.push_back(i - m);
+
+        while (q.size() >= 2 && slope(q[0], q[1]) <= i)
+            q.pop_front();
+        
+        int j = q.front();
+        dp[i] = dp[j] + (g[i] - g[j]) * i - (s[i] - s[j]);
+    }
+
+    int ans = INF;
+    for (int i = t.back(); i <= max_t; i++) 
+        ans = min(ans, dp[i]);
+    cout << ans << '\n';
+    return 0;
+
 }
