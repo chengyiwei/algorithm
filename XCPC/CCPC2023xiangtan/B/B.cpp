@@ -24,7 +24,6 @@ signed main() {
         g[u].push_back(edges.size() - 1);
     }
 
-
     //tarjan
     vector<int> dfn(n, -1), low(n, -1), scc(n, -1);
     vector<vector<int>> scc_g;
