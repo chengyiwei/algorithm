@@ -22,8 +22,8 @@ void calc(vector<ll> &a, vector<vector<ll> > &dp) {
 
 
 int main() {
-    // freopen ("D.in", "r", stdin);
-    // freopen ("D.out", "w", stdout);
+    freopen ("D.in", "r", stdin);
+    freopen ("D.out", "w", stdout);
     int n; cin >> n;
     vector<ll> a(n + 1);
     for (int i = 1; i <= n; i++) cin >> a[i];
