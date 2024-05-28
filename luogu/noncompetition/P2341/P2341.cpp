@@ -1,76 +1,65 @@
-#include<bits/stdc++.h>
+#include <bits/stdc++.h>
 using namespace std;
-int n,m,ans;
-int cnt;
-vector<vector<int> > E;
-struct Tarjan{
-    int n;
-    vector<int>dfn,low;int dfn_cnt;
-    vector<int> scc;int sc; //节点 i 所在 SCC 的编号
-    vector<int> siz; //强连通 i 的大小
-    stack<int> st;
-    vector<int> in_st;//判断是否在栈内
 
-    void init(int n){
-        this->n=n;
-        dfn.resize(n+1);low.resize(n+1);dfn_cnt=0;
-        scc.assign(n+1,0);sc=0;siz.assign(n+1,0);
-        while(!st.empty())st.pop();
-        in_st.assign(n+1,0);
+struct Tarjan {
+    int n, dfn_cnt, scc_cnt;
+    vector<int> dfn, low, scc, in_st, siz;
+    stack<int> st;
+    vector<vector<int>> g;
+
+    void init (int n_, vector<vector<int>> &g_) {
+        n = n_; g = g_;
+        dfn_cnt = scc_cnt = 0;
+        dfn.resize(n + 1); low.resize(n + 1); scc.resize(n + 1); siz.resize(n + 1);
+        while (!st.empty()) st.pop(); in_st.assign(n + 1, 0);
     }
 
-    void tarjan(int u){
-        low[u]=dfn[u]=++dfn_cnt;st.push(u);in_st[u]=1;
-        for(int i=0;i<E[u].size();i++){
-            int& v=E[u][i];
-            if(!dfn[v]){//没有访问过
+    void tarjan (int u) {
+        low[u] = dfn[u] = ++dfn_cnt; 
+        st.push(u); in_st[u] = 1;
+        for (int i = 0; i < g[u].size(); i++) {
+            int &v = g[u][i];
+            if (!dfn[v]) {
                 tarjan(v);
-                low[u]=min(low[u],low[v]);
-            }else if(in_st[v]){
-                low[u]=min(low[u],dfn[v]);
-            }
+                low[u] = min(low[u], low[v]);
+            }else if (in_st[v])
+                low[u] = min(low[u], dfn[v]);
         }
-        if(dfn[u]==low[u]){ //找到双连通分量了
-            ++sc; 
-            while(st.top()!=u){ //从栈顶到 u 都是这个强连通分量里面的
-                scc[st.top()]=sc;siz[sc]++;
-                in_st[st.top()]=0;st.pop();
+        if (dfn[u] == low[u]) {
+            scc_cnt += 1;
+            while (st.top() != u) {
+                int x = st.top(); st.pop();
+                in_st[x] = 0; scc[x] = scc_cnt; siz[scc_cnt] += 1;
             }
-            scc[st.top()]=sc;siz[sc]++;
-            in_st[st.top()]=0;st.pop();
+            int x = st.top(); st.pop();
+            in_st[x] = 0; scc[x] = scc_cnt; siz[scc_cnt] += 1;
         }
-        return ;
     }
 };
-int main(){
-    freopen("P2341.in","r",stdin);
-    scanf("%d %d\n",&n,&m);
-    E.resize(n+1);
-    for(auto& e:E) e.clear();
-    for(int i=1;i<=m;i++){
-        int x,y;scanf("%d%d",&x,&y);
-        E[x].push_back(y);
-    }
 
-    Tarjan F;F.init(n);
-    for(int i=1;i<=n;i++) if(!F.dfn[i]){
-        F.dfn_cnt=0;
-        F.tarjan(i);
+int main() {
+    int n, m; cin >> n >> m;
+    vector<vector<int>> g(n + 1);
+    for (int i = 1; i <= m; i++) {
+        int u, v; cin >> u >> v;
+        g[u].push_back(v);
     }
-
-    vector<int> du(n+1,0);
-    for(int u=1;u<=n;u++)
-        for(int& v:E[u]){
-            if(F.scc[u]!=F.scc[v]){
-                du[F.scc[u]]++;
-            }
+    Tarjan tarjan; tarjan.init(n, g);
+    for (int i = 1; i <= n; i++)
+        if (!tarjan.dfn[i])
+            tarjan.tarjan(i);
+    
+    vector<int> du(tarjan.scc_cnt + 1, 0);
+    for (int u = 1; u <= n; u++)
+        for (int v : g[u])
+            if (tarjan.scc[u] != tarjan.scc[v])
+                du[tarjan.scc[u]] += 1;
+    int ans = 0, cnt = 0;
+    for (int i = 1; i <= tarjan.scc_cnt; i++)
+        if (!du[i]) {
+            cnt += 1;
+            ans += tarjan.siz[i];
         }
-    for(int i=1;i<=F.sc;i++)
-        if(du[i]==0){
-            cnt++;
-            ans+=F.siz[i];
-        }
-    if(cnt==1) printf("%d\n",ans);
-    else printf("0\n");
+    cout << (cnt == 1 ? ans : 0) << '\n';
     return 0;
 }

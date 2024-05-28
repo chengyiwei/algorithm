@@ -9,17 +9,6 @@ struct Node{
 
 int cnt,rt;
 
-int read(){
-    int x=0,f=1;char ch=getchar();
-    while(ch<'0'||ch>'9'){if(ch=='-') f=-1;ch=getchar();}
-    while(ch>='0'&&ch<='9'){x=x*10+ch-'0';ch=getchar();}
-    return x*f;
-}
-
-int brand(){
-    return (rand()<<15)|rand();
-}
-
 void push_up(int x){
     t[x].siz=t[t[x].ch[0]].siz+t[t[x].ch[1]].siz+1;
 }
@@ -149,9 +138,10 @@ int nxt(int val, int x = rt){
 
 signed main(){
     freopen("P3369.in","r",stdin);
-    int T; T=read();
+    int T; cin >> T;
     while(T--){
-        int op = read(), x = read();
+        int op, x;
+        cin >> op >> x;
         if(op == 1)
             insert(x);
         else if(op == 2)
