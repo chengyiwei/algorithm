@@ -1,17 +1,12 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-bool is_prime (int x) {
-    if (x < 2) return false;
-    for (int i = 2; i * i <= x; i++) {
-        if (x % i == 0) return false;
-    }
-    return true;
-}
+
 
 int main() {
-    int n; cin >> n;
-    if (is_prime(n)) cout << "YES" << endl;
-    else cout << "NO" << endl;
+    vector<pair<int, int>> v;
+    v.push_back({1, 70}); v.push_back({4,50});
+    auto p = lower_bound(v.begin(), v.end(), make_pair(1, 80));
+    cout << p->first << " " << p->second << endl;
     return 0;
 }
