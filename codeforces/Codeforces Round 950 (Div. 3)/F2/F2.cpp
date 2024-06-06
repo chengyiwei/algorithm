@@ -1,77 +1,83 @@
 #include <bits/stdc++.h>
 using namespace std;
-
-typedef pair<int, int> pii;
 typedef long long ll;
-typedef tuple<int, int, int> t3;
-bool cmp (t3 a, t3 b) {
-    auto [x1, y1, id1] = a;
-    auto [x2, y2, id2] = b;
-    return x1 < x2 || (x1 == x2 && y1 > y2);
-}
+
+struct Node{
+    int x, y, id;
+    Node() {};
+    Node(int x, int y, int id) : x(x), y(y), id(id) {};
+    bool operator < (const Node &a) const {
+        return x < a.x || (x == a.x && y > a.y);
+    }
+};
+
+
 void solve() {
     int n, m, k; cin >> n >> m >> k;
-    vector<t3> a(k + 1);
+    vector<Node> a(k + 2);
     for (int i = 1; i <= k; i++) {
-        auto &[x, y, id] = a[i];
-        cin >> x >> y; id = i;
+        int x, y; cin >> x >> y;
+        a[i] = Node(x, y, i);
     }
+    a[0] = Node(0, 0, 0); a[k + 1] = Node(n + 1, m + 1, k + 1);
+    sort(a.begin() , a.end());
+    vector<int> pre(k + 2, -1), in_stk(k + 2, 0), nxt(k + 2, -1);
     stack<int> stk;
-    vector<int> in_st(k + 1, 0), pre(k + 1, -1);
-    sort(a.begin() + 1, a.end(), cmp);
-    for (int i = 1; i <= k; i++) {
-        auto [x, y, id] = a[i];
-        int p_ = -1;
-        while (!stk.empty()) {
-            int tp = stk.top();
-            auto [x1, y1, id1] = a[tp];
-            auto [x2, y2, id2] = a[i];
-            if (y1 < y2) break;
-            p_ = tp;
-            in_st[tp] = 0;
+    for (int i = 0; i <= k + 1; i++) {
+        while (stk.size() && a[stk.top()].y >= a[i].y)
             stk.pop();
-        }
-        stk.push(i); in_st[i] = 1;
-        pre[stk.size()] = p_;
+        if (stk.size())
+            pre[i] = stk.top();
+        else 
+            pre[i] = -1;
+        stk.push(i);
     }
-    ll ans = 0;
-    vector<t3> p;
-    p.push_back({0, 0, 0});
-    for (int i = 1; i <= k; i ++) {
-        if (in_st[i]) 
-            p.push_back(a[i]);
-    }
-    p.push_back({n, m + 1, k + 1});
-    for (int i = 0; i + 1 < p.size(); i++) {
-        auto [x1, y1, id1] = p[i];
-        auto [x2, y2, id2] = p[i + 1];
-        ans += 1ll * (x2 - x1) * (y2 - 1);
+    ll ans = -m; int cur = k + 1;
+    while (pre[cur] != -1) {
+        int p = pre[cur];
+        in_stk[cur] = 1; in_stk[p] = 1;
+        nxt[p] = cur;
+        ans += 1ll * (a[cur].x - a[p].x) * (a[cur].y - 1);
+        cur = p;
     }
     cout << ans << endl;
-    vector<int> ans_id(k + 1, 0);
-    for (int i = 1; i < p.size() - 1; i++) {
-        ll add = 0;
-        auto [x0, y0, id0] = p[i - 1];
-        auto [x1, y1, id1] = p[i];
-        auto [x2, y2, id2] = p[i + 1];
-        if (pre[i] == -1) {
-            add = 1ll * (x1 - x0) * (y2 - y1);
+
+    vector<ll> add(k + 2, 0); vector<int> new_pre(k + 2, -1);
+    for (int i = 1; i <= k; i++) if (in_stk[i]) {
+        int p_ = pre[i], n_ = nxt[i];
+        add[i] -= 1ll * (a[i].x - a[p_].x) * (a[i].y - 1);
+        add[i] -= 1ll * (a[n_].x - a[i].x) * (a[n_].y - 1);
+        while (!stk.empty()) stk.pop();
+        for (int j = p_; ; j++) {
+            if (j == i) continue;
+            while (stk.size() && a[stk.top()].y >= a[j].y)
+                stk.pop();
+            if (stk.size())
+                new_pre[j] = stk.top();
+            else 
+                new_pre[j] = -1;
+            stk.push(j);
+            if (j == n_) break;
         }
-        else {
-            auto [x_pre, y_pre, id_pre] = a[pre[i]];
-            add = 1ll * (x1 - x_pre) * (y2 - y1) + 1ll * (x_pre - x0) * (min(y_pre, y2) - y1);
+        for (int j = n_; new_pre[j] != -1; j = new_pre[j]) {
+            add[i] += 1ll * (a[j].x - a[new_pre[j]].x) * (a[j].y - 1);
         }
-        ans_id[id1] = add;
     }
-    for (int i = 1; i <= k; i++) 
-        cout << ans_id[i] << " ";
-    cout << endl;
+    
+    vector<ll> ret_add(k + 2, 0);
+    for (int i = 1; i <= k; i++) {
+        int id = a[i].id;
+        ret_add[id] = add[i];
+    }
+    for (int i = 1; i <= k; i++) {
+        cout << min(1ll, ret_add[i]) << " \n"[i == k];
+    }
 }
 
 int main() {
     freopen ("F2.in", "r", stdin);
     ios::sync_with_stdio(0);
-    int t; cin >> t;
-    while (t--) solve();
+    int T; cin >> T;
+    while (T--) solve();
     return 0;
 }
