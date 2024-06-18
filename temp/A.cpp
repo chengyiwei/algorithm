@@ -1,12 +1,20 @@
 #include <bits/stdc++.h>
 using namespace std;
-
-
-
 int main() {
-    vector<pair<int, int>> v;
-    v.push_back({1, 70}); v.push_back({4,50});
-    auto p = lower_bound(v.begin(), v.end(), make_pair(1, 80));
-    cout << p->first << " " << p->second << endl;
-    return 0;
+    int n; cin >> n;
+    vector<int> a(n + 1);
+    for (int i = 1; i <= n; i++) cin >> a[i];
+
+    //直接插入排序
+    for (int i = 2; i <= n; i++) {
+        int temp = a[i], j = i;
+        while (j > 1 && a[j - 1] > temp) {
+            a[j] = a[j - 1];
+            j--;
+        }
+        a[j] = temp;
+    }
+
+    for (int i = 1; i <= n; i++) cout << a[i] << " ";
+
 }
