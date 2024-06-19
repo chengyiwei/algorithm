@@ -81,15 +81,16 @@ vector<vector<char>> get(int n, int m) {
     if (m == 2) return get_n2(n);
     if (n == 2) return get_2m(m);
     vector<vector<char>> res(n, vector<char>(m));
-    if (n % 3 == 1) {
-        auto A = get(n - 2, m - 2), B = get_n2(2), C = get(2, m - 2), D = get(n - 2, 2);
-        flip_x(C); flip_y(D); A[0].back() = 'C'; C.back().back() = 'D'; D.front().front() = 'L';
-        int dx, dy;
+    if (n == m) {
+        if (n % 3 == 1) {
+            auto A = get(n - 2, m - 2), B = get_n2(2), C = get(2, m - 2), D = get(n - 2, 2);
+            flip_x(C); flip_y(D); A[0].back() = 'C'; C.back().back() = 'D'; D.front().front() = 'L';
+            int dx, dy;
 
-        dx = 2, dy = 0;
-        for (int i = 0; i < n - 2; i++) 
-            for (int j = 0; j < m - 2; j++) 
-                res[i + dx][j + dy] = A[i][j];
+            dx = 2, dy = 0;
+            for (int i = 0; i < n - 2; i++) 
+                for (int j = 0; j < m - 2; j++) 
+                    res[i + dx][j + dy] = A[i][j];
         
         dx = 0, dy = m - 2;
         for (int i = 0; i < 2; i++) 
@@ -98,38 +99,93 @@ vector<vector<char>> get(int n, int m) {
         
         dx = 0, dy = 0;
         for (int i = 0; i < 2; i++)
-            for (int j = 0; j < m - 2; j++)
-                res[i + dx][j + dy] = C[i][j];
-        
-        dx = 2, dy = m - 2;
-        for (int i = 0; i < n - 2; i++)
-            for (int j = 0; j < 2; j++)
-                res[i + dx][j + dy] = D[i][j];
+                for (int j = 0; j < m - 2; j++)
+                    res[i + dx][j + dy] = C[i][j];
+            
+            dx = 2, dy = m - 2;
+            for (int i = 0; i < n - 2; i++)
+                for (int j = 0; j < 2; j++)
+                    res[i + dx][j + dy] = D[i][j];
+        }
+        else {
+            auto A = get(n - 4, m - 4), B = get_44(), C = get(4, m - 4), D = get(n - 4, 4);
+            flip_x(C); flip_y(D); A[0].back() = 'C'; C.back().back() = 'D'; D.front().front() = 'L';
+            int dx, dy;
+
+            dx = 4, dy = 0;
+            for (int i = 0; i < n - 4; i++) 
+                for (int j = 0; j < m - 4; j++) 
+                    res[i + dx][j + dy] = A[i][j];
+            
+            dx = 0, dy = m - 4;
+            for (int i = 0; i < 4; i++) 
+                for (int j = 0; j < 4; j++) 
+                    res[i + dx][j + dy] = B[i][j];
+
+            dx = 0, dy = 0;
+            for (int i = 0; i < 4; i++)
+                for (int j = 0; j < m - 4; j++)
+                    res[i + dx][j + dy] = C[i][j];
+
+            dx = 4, dy = m - 4;
+            for (int i = 0; i < n - 4; i++)
+                for (int j = 0; j < 4; j++)
+                    res[i + dx][j + dy] = D[i][j];
+        }
     }
     else {
-        auto A = get(n - 4, m - 4), B = get_44(), C = get(4, m - 4), D = get(n - 4, 4);
-        flip_x(C); flip_y(D); A[0].back() = 'C'; C.back().back() = 'D'; D.front().front() = 'L';
-        int dx, dy;
+        if (n % 3 == 1) {
+            int L = min(n, m) - 2;
+            auto A = get(L, L), B = get(n - L, m - L), C = get(n - L, L), D = get(L, m - L);
+            flip_x(C); flip_y(D); A[0].back() = 'C'; C.back().back() = 'D'; D.front().front() = 'L';
+            int dx, dy;
 
-        dx = 4, dy = 0;
-        for (int i = 0; i < n - 4; i++) 
-            for (int j = 0; j < m - 4; j++) 
-                res[i + dx][j + dy] = A[i][j];
-        
-        dx = 0, dy = m - 4;
-        for (int i = 0; i < 4; i++) 
-            for (int j = 0; j < 4; j++) 
-                res[i + dx][j + dy] = B[i][j];
+            dx = n - L, dy = 0;
+            for (int i = 0; i < L; i++)
+                for (int j = 0; j < L; j++)
+                    res[i + dx][j + dy] = A[i][j];
+            
+            dx = 0, dy = L;
+            for (int i = 0; i < n - L; i++)
+                for (int j = 0; j < m - L; j++)
+                    res[i + dx][j + dy] = B[i][j];
+            
+            dx = 0, dy = 0;
+            for (int i = 0; i < n - L; i++)
+                for (int j = 0; j < L; j++)
+                    res[i + dx][j + dy] = C[i][j];
+            
+            dx = n - L, dy = L;
+            for (int i = 0; i < L; i++)
+                for (int j = 0; j < m - L; j++)
+                    res[i + dx][j + dy] = D[i][j];
+        }
+        else {
+            int L = min(n, m) - 4;
+            auto A = get(L, L), B = get(n - L, m - L), C = get(n - L, L), D = get(L, m - L);
+            flip_x(C); flip_y(D); A[0].back() = 'C'; C.back().back() = 'D'; D.front().front() = 'L';
+            int dx, dy;
 
-        dx = 0, dy = 0;
-        for (int i = 0; i < 4; i++)
-            for (int j = 0; j < m - 4; j++)
-                res[i + dx][j + dy] = C[i][j];
-
-        dx = 4, dy = m - 4;
-        for (int i = 0; i < n - 4; i++)
-            for (int j = 0; j < 4; j++)
-                res[i + dx][j + dy] = D[i][j];
+            dx = n - L, dy = 0;
+            for (int i = 0; i < L; i++)
+                for (int j = 0; j < L; j++)
+                    res[i + dx][j + dy] = A[i][j];
+            
+            dx = 0, dy = L;
+            for (int i = 0; i < n - L; i++)
+                for (int j = 0; j < m - L; j++)
+                    res[i + dx][j + dy] = B[i][j];
+            
+            dx = 0, dy = 0;
+            for (int i = 0; i < n - L; i++)
+                for (int j = 0; j < L; j++)
+                    res[i + dx][j + dy] = C[i][j];
+            
+            dx = n - L, dy = L;
+            for (int i = 0; i < L; i++)
+                for (int j = 0; j < m - L; j++)
+                    res[i + dx][j + dy] = D[i][j];
+        }
     }
     return res;
 }
@@ -147,7 +203,7 @@ void solve() {
 
 int main() {
     freopen ("D.in", "r", stdin);
-    // freopen ("J.out", "w", stdout);
+    freopen ("D.out", "w", stdout);
     ios::sync_with_stdio(false);
     int T; cin >> T;
     while (T--) solve();
