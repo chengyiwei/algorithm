@@ -57,6 +57,7 @@ bool solve() {
 }
 
 int main() {
+    freopen ("E.in", "r", stdin);
     ios::sync_with_stdio(false);
     int T; cin >> T;
     while (T--) 
