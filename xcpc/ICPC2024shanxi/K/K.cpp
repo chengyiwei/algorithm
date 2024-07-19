@@ -1,14 +1,18 @@
 #include <bits/stdc++.h>
 using namespace std;
-#define int __int128
+#define int long long
 typedef pair<int, int> pii;
-const int INF = 1e18 + 1000;
-
+const int INF = 3e18 + 1000;
+const int maxn = 5e5 + 5;
+int n, m, k; 
+int cnt[maxn];
+pii cost[maxn];
 struct Node {
-    int tim, pos;
-    Node (int t, int p) {tim = t, pos = p;}
-    bool operator < (const Node B) const {return tim < B.tim;}
-};
+    int tim, pos, id;
+    bool operator < (const Node &a) const {
+        return tim < a.tim;
+    }
+}a[maxn];
 
 int read() {
     int x = 0, f = 1; char ch = getchar();
@@ -23,44 +27,42 @@ void write(int x) {
     putchar(x % 10 + '0');
 }
 
+bool check (int T) {
+    for (int i = 1; i <= n; i++) cnt[i] = 0;
+    int num = 0;
+    for (int j = m; j >= 1; j--) {
+        int id = a[j].id;
+        if (a[j].tim > T) continue;
+        if (1) {
+            int now = ((T - a[j].tim + 1 - cnt[id])) + (- a[j].pos + 1) / k;
+            if (now <= 0) continue;
+            cnt[id] += now;
+            cost[num++] = {a[j].tim, now};
+        }
+    }
+    int sum = 0;
+    for (int i = 0; i < num; i++) {
+        sum += cost[i].second;
+        if (sum > T + 1 - cost[i].first)
+            return false;
+    }
+    return true;
+}
+
 signed main() {
     freopen ("K.in", "r", stdin);
+    freopen ("K.out", "w", stdout);
     // ios::sync_with_stdio(0);
-    int n, m, k; n = read(), m = read(), k = read();
-    vector<vector<Node>> a(n + 1,vector<Node>());
+    n = read(), m = read(), k = read();
+    set<int> st;
     for (int i = 1; i <= m; i++) {
-        int t, x, y; t = read(), x = read(), y = read();
-        a[x].push_back(Node(t, y));
+        int t, id, y; t = read(), id = read(), y = read();
+        st.insert(id);
+        a[i] = {t, y, id};
     }
-    for (int i = 1; i <= n; i++)
-        sort(a[i].begin(), a[i].end());
-    
-    auto check = [&] (int T) {
-        vector<pii> cost;
-        for (int i = 1; i <= n; i++) {
-            int cnt = 0;
-            int siz = a[i].size();
-            for (int j = siz - 1; j >= 0; j--) {
-                if (a[i][j].tim > T) continue;
-                if ((T - a[i][j].tim - cnt) * k > a[i][j].pos) {
-                    int now = (((T - a[i][j].tim - cnt) * k) - a[i][j].pos + k) / k;
-                    cnt += now;
-                    cost.push_back({a[i][j].tim, now});
-                }
-            }
-        }
-        sort(cost.begin(), cost.end());
-        int sum = 0;
-        int siz = cost.size();
-        for (int i = siz - 1; i >= 0; i--) {
-            sum += cost[i].second;
-            if (sum > T - cost[i].first)
-                return false;
-        }
-        return true;
-    };
-
-    int L = 1, R = INF;
+    if (st.size() == 1) { puts("-1"); return 0; }
+    sort(a + 1, a + m + 1);
+    int L = 0, R = INF;
     while (L + 1 < R) {
         int mid = (R + L) / 2;
         if (check (mid))
@@ -68,9 +70,6 @@ signed main() {
         else 
             R = mid;
     }
-    if (L == INF - 1)   
-        puts("-1");
-    else
-        write(L - 1);
+    write(L);
     return 0;
 }
