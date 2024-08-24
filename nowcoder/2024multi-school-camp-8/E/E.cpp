@@ -1,67 +1,84 @@
 #include <bits/stdc++.h>
-#pragma GCC optimize(2)
-#pragma GCC optimize(3)
+#define int long long
 using namespace std;
-typedef long long ll;
+constexpr int maxn = 1e6 + 5;
+constexpr int M = 1e6;
 
-int cnt = 0;
+vector<int> prime;
 
-unordered_map<ll, ll> mp;
-unordered_map<ll, ll> mp2;
-
-inline ll S(ll x) {
-    if (mp.count(x)) return mp[x];
-    ll res = 0;
+int s(int x) {
+    int ret = 0;
     while (x) {
-        // cnt += 1;
-        res += x % 10;
+        ret += x % 10;
         x /= 10;
     }
-    return mp[x] = res;
+    return ret;
 }
 
+vector<int> get_prime() {
+    vector<int> prime;
+    vector<int> vis(maxn, 0);
+    for (int i = 2; i < maxn; i++) {
+        if (vis[i] == 0) {
+            prime.push_back(i);
+            for (int j = i + i; j < maxn; j += i)
+                vis[j] = 1;
+        }
+    }
+    return prime;
+}
 
 void solve() {
-    ll n; cin >> n;
-    if (mp2[n]) {
-        cout << mp2[n] << '\n';
-        return;
-    }
-    ll n_ = n;
-    int siz = 0, tp = 0, t;
-    while (n) {
-        tp += tp % 10; 
-        if (n < 10) t = n; 
-        n /= 10; siz += 1; 
-    } // siz 表示 n 的位数
-    tp = max(tp, (siz - 1) * 9 + t - 1); // tp 表示 n 的各位和
-    int ans = 0; n = n_;
-    ll l = 1, r = 0, Up, Dn;
-    while (l <= n) {
-        r = n / (n / l);
-        Up = n / l, Dn = (n - tp + r - 1) / r;
-        cnt += 1;
-        if (Up >= Dn) {
-            for (ll m = Dn; m <= Up; m += 1) {
-                ll Sm = S(m);
-                if (Sm < m && (n - Sm) % m == 0 && (n - Sm) / m >= l && (n - Sm) / m <= r) {
-                    ans += 1;
-                }
-            }
+    int n; cin >> n;
+    const int L = max(n - M, 1ll), R = n, len = R - L + 1;
+    vector<int> a(len);
+    vector<vector<pair<int, int>>> p(len, vector<pair<int, int>>(0));
+    for (int i = L; i <= R; i++) a[i - L] = i;
+    for (auto v : prime) {
+        int pos = L % v;
+        if (pos >= len) continue;
+        int cnt = 0, sum = 1;
+        while (a[pos] % v == 0) {
+            a[pos] /= v; sum *= v; cnt += 1;
         }
-        l = r + 1;
+        for (int i = pos; i < len; i += v) {
+            a[i] /= sum;
+            while (a[i] % v == 0) {
+                a[i] /= v; sum *= v; cnt += 1;
+            }
+            if (cnt) p[i].push_back({v, cnt});
+        }
     }
-    mp2[n] = ans;
+    for (int i = 0; i < len; i++) {
+        if (a[i] > 1) p[i].push_back({a[i], 1});
+    }
+    
+    int ans = 0;
+    
+    auto dfs = [&] (auto &&dfs, int pos, int now, vector<pair<int, int>> &p) -> void {
+        auto [pr, cnt] = p[pos];
+        if (pos == (int)p.size()) {
+            int Sm = s(now);
+            if (n % now == Sm) ans += 1;
+            return;
+        }
+        for (int i = 0; i <= cnt; i++) {
+            dfs(dfs, pos + 1, now, p);
+            now *= pr;
+        }
+    };
+
+    for (int i = 0; i < len; i++)
+        dfs(dfs, 0, 1, p[i]);
+
     cout << ans << '\n';
 }
 
-int main() {
+signed main() {
     freopen ("E.in", "r", stdin);
-    freopen ("E.out", "w", stdout);
     ios::sync_with_stdio(false);
     int T; cin >> T;
+    prime = get_prime();
     while (T--) solve();
-    cout << clock() << '\n';
-    cout << cnt << '\n';
     return 0;
 }
