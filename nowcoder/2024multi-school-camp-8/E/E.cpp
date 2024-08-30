@@ -2,7 +2,7 @@
 #define int long long
 using namespace std;
 constexpr int maxn = 1e6 + 5;
-constexpr int M = 1e6;
+constexpr int M = 108;
 
 vector<int> prime;
 
@@ -35,16 +35,12 @@ void solve() {
     vector<vector<pair<int, int>>> p(len, vector<pair<int, int>>(0));
     for (int i = L; i <= R; i++) a[i - L] = i;
     for (auto v : prime) {
-        int pos = L % v;
+        int pos = (L + v - 1) / v * v - L; 
         if (pos >= len) continue;
-        int cnt = 0, sum = 1;
-        while (a[pos] % v == 0) {
-            a[pos] /= v; sum *= v; cnt += 1;
-        }
         for (int i = pos; i < len; i += v) {
-            a[i] /= sum;
+            int cnt = 0;
             while (a[i] % v == 0) {
-                a[i] /= v; sum *= v; cnt += 1;
+                a[i] /= v; cnt += 1;
             }
             if (cnt) p[i].push_back({v, cnt});
         }
@@ -53,13 +49,13 @@ void solve() {
         if (a[i] > 1) p[i].push_back({a[i], 1});
     }
     
-    int ans = 0;
+    set<int> ans;
     
     auto dfs = [&] (auto &&dfs, int pos, int now, vector<pair<int, int>> &p) -> void {
         auto [pr, cnt] = p[pos];
         if (pos == (int)p.size()) {
             int Sm = s(now);
-            if (n % now == Sm) ans += 1;
+            if (n % now == Sm) ans.insert(now);
             return;
         }
         for (int i = 0; i <= cnt; i++) {
@@ -68,14 +64,15 @@ void solve() {
         }
     };
 
-    for (int i = 0; i < len; i++)
+    for (int i = 0; i < len; i++) {
+        if (p[i].empty()) continue;
         dfs(dfs, 0, 1, p[i]);
+    }
 
-    cout << ans << '\n';
+    cout << ans.size() << '\n';
 }
 
 signed main() {
-    freopen ("E.in", "r", stdin);
     ios::sync_with_stdio(false);
     int T; cin >> T;
     prime = get_prime();
