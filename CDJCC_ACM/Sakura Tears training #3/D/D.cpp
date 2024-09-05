@@ -50,7 +50,7 @@ void solve() {
     cout << sum << '\n';
 }
 
-int main() {
+signed main() {
     freopen ("D.in", "r", stdin);
     ios::sync_with_stdio(0);
     cin.tie(0);
