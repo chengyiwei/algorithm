@@ -20,12 +20,14 @@ int main() {
         for (int len = 1; len <= m; len++)
             for (int l = 1; l <= m; l++) {
                 int r = l + len - 1;
-                ll tmp = 0;
+                dp[i][l][r] = (dp[i][l][r] + dp[i - 1][l][r] * 2) % TT;
                 for (int k = l; k <= r; k++) {
                     if (T[k] == S[i])
-                        tmp = (tmp + 1ll * get_(i, l, k - 1) * get_(i, k + 1, r)) % TT;
+                        dp[i][l][r] = (dp[i][l][r] + get_(i - 1, l, k - 1) * get_(i - 1, k + 1, r)) % TT;
                 }
-                dp[i][l][r] = tmp;
+                for (int k = l; k + 1 <= r; k++) {
+                    dp[i][l][r] = (dp[i][l][r] + dp[i - 1][l][k] * dp[i - 1][k + 1][r]) % TT;
+                }
             }
     cout << dp[n][1][m] << '\n';
     return 0;
