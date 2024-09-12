@@ -67,11 +67,10 @@ int main() {
         int res = 0;
         for (auto [x, y] : cnt) {
             if (k % 2 == 0 && x == k / 2) res += 1ll * y * (y - 1) / 2;
-            else if (x <= k / 2){
-                auto it = lower_bound(cnt.begin(), cnt.end(), make_pair(k - x, 0));
-                if (it != cnt.end() && it -> first == k - x)
-                    res += 1ll * y * it -> second;
-            }
+        }
+        for (int i = 0, j = (int)cnt.size() - 1; i < j; i++) {
+            while (j > i && cnt[i].first + cnt[j].first > k) j--;
+            if (j > i && cnt[i].first + cnt[j].first == k) res += 1ll * cnt[i].second * cnt[j].second;
         }
         return res;
     };
@@ -98,5 +97,6 @@ int main() {
         // cout << ans << '\n';
         cout << (ans ? "AYE" : "NAY") << '\n';
     }
+    cout << (int)clock()/CLOCKS_PER_SEC << "s\n";
     return 0;
 }
