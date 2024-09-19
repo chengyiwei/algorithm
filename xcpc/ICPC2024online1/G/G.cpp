@@ -75,7 +75,7 @@ struct Splay {
 
 int main() {
     freopen("G.in", "r", stdin);
-    // freopen("G.out", "w", stdout);
+    freopen("G.out", "w", stdout);
     int n; cin >> n;
     vector<int> a(n + 1);
     Splay T(n + 1);
@@ -92,39 +92,33 @@ int main() {
         }
     }
 
-    for (int i = 1; i <= n; i++) {
-        for (int j = 1; j <= n; j++) {
-            cout << b[i][j] << ' ';
-        }
-        cout << '\n';
-    }
-
     vector<vector<int>> c(n + 1, vector<int>(n + 1, 0)), sum(n + 1, vector<int>(n + 1, 0));
 
     auto check = [&](int mid) -> bool {
         for (int i = 1; i <= n; i++) 
-            for (int j = 1; j <= n; j++) {
+            for (int j = i; j <= n; j++) {
                 if (b[i][j] >= mid) c[i][j] = 1;
                 else c[i][j] = -1;
-                sum[i][j] = sum[i - 1][j] + sum[i][j - 1] - sum[i - 1][j - 1] + c[i][j];
+            }
+
+        for (int i = 1; i <= n; i++)
+            for (int j = 1; j <= n; j++) {
+                sum[i][j] = c[i][j] + sum[i - 1][j] + sum[i][j - 1] - sum[i - 1][j - 1];
             }
 
         auto get = [&](int x1, int y1, int x2, int y2) -> int {
             return sum[x2][y2] - sum[x1 - 1][y2] - sum[x2][y1 - 1] + sum[x1 - 1][y1 - 1];
         };
-
-        int num = 0, s = 0;
+       int num = 0, s = 0;
         for (int i = 1; i <= n; i++)
             for (int j = i; j <= n; j++) {
-                num += (get(i, 1, n, j) >= 0);
+                num += (get(i, 1, n, j) > 0);
                 s += 1;
             }
-        return num >= (s + 1) / 2;
+        return num >= (s) / 2 + 1;
     };
 
-    check(0);
-
-    int l = 0, r = 1e9;
+    int l = -1, r = 1e9 + 10;
     while (l + 1 < r) {
         int mid = (l + r) >> 1;
         if (check(mid)) l = mid;
