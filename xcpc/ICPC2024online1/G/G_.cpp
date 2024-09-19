@@ -75,13 +75,12 @@ struct Splay {
 
 int main() {
     freopen("G.in", "r", stdin);
-    freopen("G.out", "w", stdout);
+    // freopen("G.out", "w", stdout);
     int n; cin >> n;
     vector<int> a(n + 1);
     Splay T(n + 1);
     for (int i = 1; i <= n; i++){
         cin >> a[i];
-        c[i][i] = a[i];
     }
     vector<vector<int>> b(n + 1, vector<int>(n + 1, 0));
     for (int i = 1; i <= n; i++) {
@@ -92,11 +91,45 @@ int main() {
             b[i][j] = T.kth(len + 1 >> 1);
         }
     }
-    
+
+    for (int i = 1; i <= n; i++) {
+        for (int j = 1; j <= n; j++) {
+            cout << b[i][j] << ' ';
+        }
+        cout << '\n';
+    }
+
+    vector<vector<int>> c(n + 1, vector<int>(n + 1, 0)), sum(n + 1, vector<int>(n + 1, 0));
+
     auto check = [&](int mid) -> bool {
-        for (int )
+        for (int i = 1; i <= n; i++) 
+            for (int j = 1; j <= n; j++) {
+                if (b[i][j] >= mid) c[i][j] = 1;
+                else c[i][j] = -1;
+                sum[i][j] = sum[i - 1][j] + sum[i][j - 1] - sum[i - 1][j - 1] + c[i][j];
+            }
+
+        auto get = [&](int x1, int y1, int x2, int y2) -> int {
+            return sum[x2][y2] - sum[x1 - 1][y2] - sum[x2][y1 - 1] + sum[x1 - 1][y1 - 1];
+        };
+
+        int num = 0, s = 0;
+        for (int i = 1; i <= n; i++)
+            for (int j = i; j <= n; j++) {
+                num += (get(i, 1, n, j) >= 0);
+                s += 1;
+            }
+        return num >= (s + 1) / 2;
     };
 
+    check(0);
+
+    int l = 0, r = 1e9;
+    while (l + 1 < r) {
+        int mid = (l + r) >> 1;
+        if (check(mid)) l = mid;
+        else r = mid;
+    }
+    cout << l << '\n';
     return 0;
-    
 }

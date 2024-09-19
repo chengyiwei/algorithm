@@ -36,6 +36,7 @@ void AC(){
     cout << ans << "\n";
 }
 int main(){
+    freopen ("F.in", "r", stdin);
     ios::sync_with_stdio(false);
     cin >> Tex;
     while(Tex --) AC();

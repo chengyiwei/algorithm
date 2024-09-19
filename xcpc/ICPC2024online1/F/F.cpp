@@ -14,6 +14,7 @@ void solve() {
         while (!stk.empty() && a[stk.top()] < a[i]) stk.pop();
         ll now = 0;
         if (!stk.empty()) now = i - stk.top() - 1;
+        if (a[stk.top()] == a[i]) now = 0;
         stk.push(i);
         cnt[i] += now;
     }
