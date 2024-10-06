@@ -75,7 +75,7 @@ void dfs_dp (int u) {
 }
 
 signed main() {
-    // freopen ("in.in", "r", stdin);
+    freopen ("in.in", "r", stdin);
     // freopen ("out.out", "w", stdout);
     ios::sync_with_stdio(false);
     cin.tie(0); cout.tie(0);
