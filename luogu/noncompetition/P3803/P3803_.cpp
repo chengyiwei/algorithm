@@ -1,64 +1,45 @@
-//NTT
+// FFT 非递归实现
 
 #include <bits/stdc++.h>
 using namespace std;
 
-typedef long long ll;
+const int MAXN = 1 << 22;
+const double eps = 1e-6, pi = acos(-1);
 
-const int MAXN = 5e6 + 10;
-const int MOD = 998244353;
+complex<double> a[MAXN], b[MAXN], c[MAXN];
+int R[MAXN];
+int n, m;
 
-int n, m, a[MAXN], b[MAXN], limit, bit;
-int rev[MAXN];
-
-void NTT(vector<int> *a, int op) {
-
+void change(complex<double> A[], int n) {
+    for (int i = 0; i < n; i++)
+        R[i] = (R[i >> 1] >> 1) + ((i & 1) ? n >> 1 : 0);
+    for (int i = 0; i < n; i++)
+        if (i < R[i]) swap(A[i], A[R[i]]); // 只需要换一次
 }
 
-ll qpow(ll a, ll b) {
-    ll res = 1;
-    while (b) {
-        if (b & 1) res = res * a % MOD;
-        a = a * a % MOD;
-        b >>= 1;
-    }
-    return res;
-}
-
-void NTT (int a[], int op) {
-    for (int i = 0; i < limit; i++)
-        if (i < rev[i]) swap(a[i], a[rev[i]]);
-    for (int mid = 1; mid < limit; mid <<= 1) {
-        ll gn = qpow(3, (MOD - 1) / (mid << 1));
-        if (op == -1) gn = qpow(gn, MOD - 2);
-        for (int j = 0, R = mid << 1; j < limit; j += R) {
-            ll g = 1;
-            for (int k = 0; k < mid; k++, g = g * gn % MOD) {
-                ll x = a[j + k], y = g * a[j + k + mid] % MOD;
-                a[j + k] = (x + y) % MOD;
-                a[j + k + mid] = (x - y + MOD) % MOD;
+void FFT(complex<double> *a, int n, int inv) { // inv 为 1 时为 FFT, inv 为 -1 时为 IFFT
+    change(a, n);
+    for (int m = 2; m <= n; m <<= 1) { // 枚举块的大小
+        complex<double> w1(cos(2 * pi / m), inv * sin(2 * pi / m));
+        for (int i = 0; i < n; i += m) { // 枚举块的起点
+            complex<double> wk(1, 0);
+            for (int j = 0; j < m / 2; j++, wk *= w1)  { // 枚举块内的每个点
+                auto x = a[i + j], y = wk * a[i + j + m / 2];
+                a[i + j] = x + y; a[i + j + m / 2] = x - y;
             }
         }
     }
 }
 
 int main() {
-    freopen ("P3803.in", "r", stdin);
-    ios::sync_with_stdio(false);
-    cin.tie(0); cout.tie(0);
-    cin >> n >> m;
-    for (int i = 0; i <= n; i++) cin >> a[i];
-    for (int i = 0; i <= m; i++) cin >> b[i];
-
-    limit = 1;
-    while (limit <= n + m) limit <<= 1, bit += 1;
-    for (int i = 0; i < limit; i++) 
-        rev[i] = (rev[i >> 1] >> 1) | ((i & 1) << (bit - 1));
-
-    NTT(a, 1); NTT(b, 1);
-    for (int i = 0; i < limit; i++) a[i] = 1ll * a[i] * b[i] % MOD;
-    NTT(a, -1);
-    ll inv = qpow(limit, MOD - 2);
-    for (int i = 0; i <= n + m; i++) cout << a[i] * inv % MOD << ' ';
-    cout << '\n';
+    scanf("%d %d", &n, &m);
+    for (int i = 0; i <= n; i++) {double x; scanf("%lf", &x); a[i].real(x);}
+    for (int i = 0; i <= m; i++) {double x; scanf("%lf", &x); b[i].real(x);}
+    int len = 1 << max((int)ceil(log2(n + m)), 1); //由于FFT需要项数为2的整数次方倍，所以多项式的次数len为第一个大于 n+m 的二的正整数次方
+    FFT(a, len, 1); FFT(b, len, 1);
+    for (int i = 0; i < len; i++) c[i] = a[i] * b[i];
+    FFT(c, len, -1);
+    for (int i = 0; i <= n + m; i++)
+        printf("%.0f ",(c[i].real() / len + eps));
+    return 0;
 }
