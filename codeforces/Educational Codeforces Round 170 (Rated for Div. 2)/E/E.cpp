@@ -395,7 +395,7 @@ int main() {
     }
     
     for (int i = 0; i <= m; i++)
-        if (i % 2 == 0) g[i] = f[m][i];
+        if (1) g[i] = f[m][i];
     
     Poly F; F.resize(m + 1);
     for (int i = 0; i <= m; i++) F[i] = g[i];
