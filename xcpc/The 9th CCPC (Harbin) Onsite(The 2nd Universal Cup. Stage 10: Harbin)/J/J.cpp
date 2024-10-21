@@ -37,5 +37,23 @@ int main() {
         SG = SG ^ sg(siz[i]);
     }
 
-    
+    int ans = 0;
+    for (int i = 1; i <= n; i++) {
+        int now_sg = SG ^ sg(siz[from[i]]);
+        for (auto v : g[i]) {
+            if (siz[v] > siz[i]) continue;
+                now_sg = now_sg ^ sg(siz[v]);
+        }
+        now_sg = now_sg ^ sg(siz[from[i]] - siz[i]);
+        if (now_sg == 0) ans += 1;
+    }
+    for (auto [u, v] : edges) {
+        int now_sg = SG ^ sg(siz[from[u]]);
+        int siz_ = std::min(siz[u], siz[v]);
+        now_sg ^= sg(siz_); now_sg ^= sg(siz[from[u]] - siz_);
+        if (now_sg == 0) ans += 1;
+    }
+
+    std::cout << ans << '\n';
+    return 0;
 }
