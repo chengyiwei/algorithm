@@ -12,7 +12,7 @@ int sgn(const ld &a) {
 std::string gauss(std::vector<std::vector<ld>> &a) { // 传入增广矩阵
     int n = a.size();
     int c = 0, r = 0;
-    for (c = 0, r = 0, c < n; c ++) {
+    for (c = 0, r = 0; c < n; c++) {
         int tmp = r;
         for (int i = r; i < n; i++)
             if (sgn(a[i][c]))
@@ -46,6 +46,7 @@ std::string gauss(std::vector<std::vector<ld>> &a) { // 传入增广矩阵
 }
 
 int main() {
+    freopen ("H.in", "r", stdin);
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr); std::cout.tie(nullptr);
 
@@ -59,5 +60,48 @@ int main() {
     ld ans = 0;
     for (int S = 1; S < (1 << n); S++) {
         int m = __builtin_popcount((S));
+        if (m <= 1)
+            continue;
+        
+        std::vector a(m, std::vector<ld>(m + 1, 0));
+        std::vector<int> b;
+
+        for (int T = S; T ; T -= T & -T) {
+            b.push_back(std::__lg(T & -T));
+        }
+
+        for (int i = 0; i <= m; i++)
+            a[0][i] = 1;
+        
+        for (int j = 1; j < m; j++) {
+            for (int k = 0; k < m; k++) 
+                a[j][k] = w[b[j]][b[k]] - w[b[j - 1]][b[k]];
+        }
+
+        // debug
+        // std::cout << "S = " << S << '\n';
+        // for (int i = 0; i < m; i++) {
+        //     for (int j = 0; j <= m; j++)
+        //         std::cout << a[i][j] << ' ';
+        //     std::cout << '\n';
+        // }
+        // std::cout << '\n';
+    
+        auto res = gauss(a);
+        if (res == "OK") {
+            ld now = 0;
+            for (int i = 0; i < m; i++)
+                if (sgn(a[i][m]) == -1) 
+                    now = -1e9;
+            
+            for (int i = 0; i < m; i ++)
+                for (int j = i + 1; j < m; j++)
+                    now += a[i][m] * a[j][m] * w[b[i]][b[j]];
+                
+            ans = std::max(ans, now);
+        }
     }
+
+    std::cout << std::fixed << std::setprecision(10) << ans << '\n';
+    return 0;
 }
