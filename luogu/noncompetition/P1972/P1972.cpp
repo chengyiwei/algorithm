@@ -1,44 +1,58 @@
-#include<bits/stdc++.h>
-using namespace std;
-const int MAXX=1e6;
-struct node{
-    int L,R,id;
-    node(int L=0,int R=0,int id=0):L(L),R(R),id(id){}
+#include <bits/stdc++.h>
+
+struct query {
+    int l, r, id;
+    bool operator < (const query &A) const {
+        return r < A.r;
+    }
 };
 
-int now_ans=0;
-vector<int> a,belong,ans,cnt;
-vector<node> q;
+int main() {
+    freopen ("P1972.in", "r", stdin);
+    std::ios::sync_with_stdio(false);
+    std::cin.tie(NULL); std::cout.tie(NULL);
 
-bool cmp(node a,node b){
-    if(belong[a.L]!=belong[b.L]) return belong[a.L]<belong[b.L];
-    return a.R<b.R;
-}
+    int n; std::cin >> n;
+    std::vector<int> a(n + 1);
+    for (int i = 1; i <= n; i++)
+        std::cin >> a[i];
 
-void add(int x){cnt[a[x]]++;if(cnt[a[x]]==1) now_ans++;}
-void del(int x){cnt[a[x]]--;if(cnt[a[x]]==0) now_ans--;}
+    int m; std::cin >> m;
+    std::vector<query> ask(m);
+    for (int i = 0; i < m; i++)
+        std::cin >> ask[i].l >> ask[i].r, ask[i].id = i;
 
-int main(){
-    freopen("P1972.in","r",stdin);
-    freopen("P1972.out","w",stdout);
-    int n;scanf("%d",&n);
-    int block=sqrt(n),t=n/block+(n%block!=0);
-    a.assign(n+1,0);belong.assign(n+1,0);ans.assign(n+1,0);cnt.assign(MAXX+1,0); 
-    for(int i=1;i<=n;i++) scanf("%d",&a[i]),belong[i]=(i-1)/block+1;
-    int m;scanf("%d",&m);q.assign(m+1,node());
-    for(int i=1;i<=m;i++){
-        int L,R;scanf("%d%d",&L,&R);
-        q[i]=node(L,R,i);
+    int M = *std::max_element(a.begin() + 1, a.end());
+    std::vector<int> c(n + 1, 0);
+    
+    auto add_x = [&] (int x, int val) {
+        for (int i = x; i <= n; i += i & -i)
+            c[i] += val;
+    };
+
+    sort(ask.begin(), ask.end());
+
+    auto query_x = [&] (int x) {
+        int ret = 0;
+        for (int i = x; i; i -= i & -i)
+            ret += c[i];
+        return ret;
+    };
+    
+    int pos = 0;
+    std::vector<int> b(M + 1, 0), ans(m, 0);
+    for (int i = 1; i <= n; i++) {
+        if (b[a[i]] != 0) add_x(b[a[i]], -1);
+        b[a[i]] = i;
+        add_x(i, 1);
+        while (pos < m && ask[pos].r == i) {
+            ans[ask[pos].id] = query_x(i) - query_x(ask[pos].l - 1);
+            pos += 1;
+        }
     }
-    sort(q.begin()+1,q.begin()+1+m,cmp);
-    int L=1,R=0;
-    for(int i=1;i<=m;i++){
-        while(L<q[i].L) del(L++);
-        while(R>q[i].R) del(R--);
-        while(L>q[i].L) add(--L);
-        while(R<q[i].R) add(++R);
-        ans[q[i].id]=now_ans;
-    }
-    for(int i=1;i<=m;i++) printf("%d\n",ans[i]);
+
+    for (int i = 0; i < m; i++)
+        std::cout << ans[i] << '\n';
+    
     return 0;
 }
