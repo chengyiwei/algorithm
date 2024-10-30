@@ -1,18 +1,31 @@
-#include <bits/stdc++.h>
-
-using namespace std;
-int main() {
-    int n, m;
-    std::vector<int> p = {50, 20, 10, 5, 2, 1};
-    while (std::cin >> n >> m) {
-        int d = m - n;
-        for (auto x : p) {
-            int num = d / x;
-            if (num) {
-                std::cout << x << " yuan: " << num << '\n';
+#include<stdio.h>
+#include<string.h>
+#include<math.h>
+int main(){
+    int N,M;
+    scanf("%d %d",&N,&M);
+    getchar();
+    char a[1000],b[1000],c[1000];//三个数组分别是题目分值，题目答案，学生答案
+    gets(a);
+    gets(b);
+    int i,j,sum[1000]={0},d[1000];//sum是学生总得分，d[1000]是学生每道题分值
+    for(i=0;i<N;i++){
+        gets(c);
+        for(j=0;j<M;j++){
+            if(c[j]==b[j]&&c[j]!=" "){
+                d[j]=(a[j]-'0');//转换成整型计算
             }
-            d -= num * x;
+            else if(c[j]==b[j]&&c[j]==' '){
+                d[j]=0;
+            }
+            else if(c[j]!=b[j]){
+                d[j]=0;
+            }
+            sum[i]+=d[j];
         }
-        std::cout << '\n';
     }
+    for(i=0;i<N;i++){
+        printf("%d\n",sum[i]);
+    }
+    return 0;
 }
