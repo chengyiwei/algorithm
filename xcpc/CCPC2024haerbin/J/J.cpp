@@ -1,58 +1,76 @@
-#include<bits/stdc++.h>
-using namespace std;
-typedef long long ll;
-#define lowbit(idx) (idx) & (-idx)
-const ll MAXN = 4e5 + 5;
-ll Tex, n, m, a[MAXN], x[MAXN], t[MAXN], tr[MAXN];
-void add(ll idx, ll k){
-    while(idx <= 2 * m){
-        tr[idx] += k;
-        idx += lowbit(idx);
+#include <bits/stdc++.h>
+#define int long long
+
+constexpr int INF = 2e9;
+
+void solve() {
+    int n, m; std::cin >> n >> m;
+    std::vector<int> a(n + 1, 0);
+    for (int i = 1; i <= n; i++)
+        std::cin >> a[i];
+    std::vector<int> x(m + 1, 0), t(m + 1, 0);
+    std::vector<int> b(n + 1, 0), nxt(m + 1, 0);
+    for (int i = 1; i <= m; i++)
+        std::cin >> x[i] >> t[i];
+
+    std::priority_queue<std::pair<int, int>, std::vector<std::pair<int, int>>, std::greater<std::pair<int, int>>> pq;
+
+    std::fill(b.begin(), b.end() , m + 1);
+    for (int i = m; i >= 1; i--) {
+        nxt[i] = b[t[i]];
+        b[t[i]] = i;
     }
-}
-ll sum(ll idx){
-    ll ret = 0;
-    while(idx > 0){
-        ret += tr[idx];
-        idx -= lowbit(idx);
+    
+    for (int i = 1; i <= n; i++) {
+        if (b[i] == m + 1) 
+            pq.push({INF, i});
+        else 
+            pq.push({x[b[i]], i});
     }
-    return ret;
-}
-void AC(){
-    cin >> n >> m;
-    ll dq = 0;
-    map<ll, ll> mp;
-    for(int i = 1; i <= n; i ++){
-        cin >> a[i];
-        dq += a[i];
-    }
-    for(int i = 1; i <= m; i ++){
-        cin >> x[i] >> t[i];
-    }
-    for(int i = 1; i <= m; i ++){
-        add(i, x[i] - x[i - 1]);
-        ll tmp = min(sum(i) - sum(mp[t[i]]), a[t[i]]);
-        cout << i << " " << sum(i) << " " << sum(mp[t[i]]) << " " << tmp << " " << mp[t[i]] << '\n';
-        dq -= x[i] - x[i - 1];
-        if(dq < 0){
-            cout << dq + x[i] << "\n";
-            goto lp;
+
+    std::vector<int> now_a = a;
+
+    int ans = 0;
+    x.push_back(INF);
+
+    for (int i = 1; i <= m + 1; i++) {
+        int len = x[i] - x[i - 1];
+
+        while (!pq.empty() && pq.top().first < x[i]) pq.pop();
+
+        while (!pq.empty()) {
+            if (len <= 0) break;
+            auto [pos, id] = pq.top();
+            if (now_a[id] < len) {
+                pq.pop();
+                len -= now_a[id];
+                ans += now_a[id];
+                now_a[id] = 0;
+            }
+            else {
+                if (now_a[id] == len) pq.pop();
+                now_a[id] -= len;
+                ans += len;
+                len = 0;
+            }
         }
-        add(i, -tmp);
-        dq += tmp;
-        mp[t[i]] = i;
+        if (len > 0) break;
+        now_a[t[i]] = a[t[i]];
+        if (nxt[i] != m + 1)
+            pq.push({x[nxt[i]], t[i]});
+        else 
+            pq.push({INF, t[i]});
     }
-    cout << x[m] + dq << "\n";
-    lp:
-    for(int i = 1; i <= 2 * m; i ++){
-        add(i, -sum(i));
-    }
+
+    std::cout << ans << '\n';
 }
-int main(){
-    freopen("in.in", "r", stdin);
-    ios::sync_with_stdio(false);
-    cin.tie(0); cout.tie(0);
-    cin >> Tex;
-    while(Tex --) AC();
+
+signed main() {
+    freopen ("J.in", "r", stdin);
+    std::ios::sync_with_stdio(false);
+    std::cin.tie(nullptr); std::cout.tie(nullptr);
+
+    int T; std::cin >> T;
+    while (T--) solve();
     return 0;
 }
