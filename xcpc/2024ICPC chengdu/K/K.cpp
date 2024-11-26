@@ -3,7 +3,7 @@ using namespace std;
 
 int M;
 
-vector<int> get_p () {
+vector<int> get_p() {
     int m = sqrt(M);
     vector<int> vis(m + 1, 0);
     vector<int> p;
@@ -103,8 +103,9 @@ int main() {
             sum_k += f[j].second;
         X.push_back({x, sum_k});
 
+        vector<pair<int, int>> Y_now;
         function<void(int, int, int)> dfs = [&] (int pos, int sum_k, int x) {
-            Y.push_back({x, sum_k});
+            Y_now.push_back({x, sum_k});
             if (pos == f.size()) return;
             for (int k = 0; k <= f[pos].second; k++) {
                 dfs(pos + 1, sum_k + k, x);
@@ -112,7 +113,14 @@ int main() {
             }
         };
 
+        Y_now.clear();
         dfs(0, 0, 1);
+        sort(Y_now.begin(), Y_now.end(), [&](pair<int, int> a, pair<int, int> b) {
+            return a.second < b.second || (a.second == b.second && a.first < b.first);
+        });
+        Y_now.resize(unique(Y_now.begin(), Y_now.end()) - Y_now.begin());
+        Y_now.resize(min((int)n, (int)Y_now.size()));
+        for (auto x : Y_now) Y.push_back(x);
     }
 
     sort(Y.begin(), Y.end());
