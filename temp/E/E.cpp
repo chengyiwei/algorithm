@@ -1,4 +1,5 @@
 #include <bits/stdc++.h>
+
 using namespace std;
 
 int main() {
@@ -6,14 +7,14 @@ int main() {
     ios::sync_with_stdio(0); cin.tie(0); cout.tie(0);
     int n, q; cin >> n >> q;
     
-    vector<vector<int>> g(n + 1);
+    vector<vector<int> > g(n + 1);
     
     for (int i = 1; i < n; i++) {
         int u, v; cin >> u >> v;
         g[u].push_back(v); g[v].push_back(u);
     }
     
-    vector<array<int, 21>> F(n + 1);
+    vector<array<int, 21> > F(n + 1);
     vector<int> f(n + 1), dep(n + 1, 0);
     vector<int> s_f(n + 1, 0), s(n + 1, 0);
     
