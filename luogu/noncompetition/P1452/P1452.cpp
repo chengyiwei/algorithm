@@ -45,9 +45,13 @@ int main() {
     vector<Point> ch = convexhull(p);
     double ans = 0;
     int m = ch.size();
-    for (int i = 0, j = 1; i < m; i++) {
-        while (dist(ch[i], ch[(j + 1) % m]) > dist(ch[i], ch[j])) j = (j + 1) % m;
-        ans = max({ans, dist(ch[i], ch[j]), dist(ch[i], ch[(j + 1) % m])});
+    for (int i = 0; i < m; i++) {
+        int j = (i + 1) % m;
+        ans += dist(ch[i], ch[j]);
+        check = dcmp(ch[i].x, ch[j].x);
+        if (check == 0) {
+            printf()
+        }
     }
     ans = ans * ans;
     printf("%.0lf\n", ans);
