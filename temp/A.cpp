@@ -1,12 +1,24 @@
 #include <bits/stdc++.h>
 using namespace std;
-int main() {
-    int n; cin >> n;
-    while (n != 1) {
-        if (n % 2 == 0) n /= 2;
-        else n = 3 * n + 1;
-        cout << n << '\n';
-    }
-    cout << "End\n"; 
-    return 0;
+typedef long long ll;
+const ll N=2e5+5;
+ll a[N],sum=0;
+map<int,int>b;
+
+int main()
+{
+    freopen ("A.in", "r", stdin);
+    freopen ("A.out", "w", stdout);
+	ll n,c;
+	cin >>n>>c;
+	for(int i=0;i<n;i++)
+	{
+		cin>>a[i];
+		b[a[i]]++;
+		a[i]-=c;
+	}
+	for(int i=0;i<n;i++)
+		sum+=b[a[i]];
+	cout<<sum;
+	return 0;
 }
