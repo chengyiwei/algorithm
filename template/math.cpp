@@ -1,8 +1,31 @@
 #include <bits/stdc++.h>
-
+using namespace std;
 
 using i64 = long long;
+using u32 = unsigned;
+using u64 = unsigned long long;
+using u128 = unsigned __int128;
+using i128 = __int128;
+
 constexpr int P = 998244353;
+
+std::istream &operator >> (std::istream &is, i128 &n) {
+    std::string s; is >> s;
+    n = 0;
+    for (char c : s) n = n * 10 + c - '0';
+    return is;
+}
+
+std::ostream &operator << (std::ostream &os, i128 n) {
+    std::string s;
+    while (n) {
+        s += '0' + n % 10;
+        n /= 10;
+    }
+    std::reverse(s.begin(), s.end());
+    return os << s;
+}
+
 
 // 取模 需要保证 -P <= x < 2P
 int norm(int x) {
@@ -18,6 +41,17 @@ int norm(int x) {
 // 快速幂
 template<class T>
 T power(T a, i64 b) {
+    T res = 1;
+    for (; b; b /= 2, a *= a) {
+        if (b % 2) {
+            res *= a;
+        }
+    }
+    return res;
+}
+
+template<class T>
+T qpow(T a, i64 b) {
     T res = 1;
     for (; b; b /= 2, a *= a) {
         if (b % 2) {
@@ -355,6 +389,9 @@ struct Poly {
     }
 };
 
+// 随机数
+mt19937_64 rnd(chrono::steady_clock::now().time_since_epoch().count());
+
 struct Comb { // 组合数
     int n;
     std::vector<Z> _fac;
@@ -401,24 +438,210 @@ struct Comb { // 组合数
     }
 };
 
+// 线段树 区间修改 + 区间查询
+template<class Info, class Lazy>
+struct LazySegmentTree {
+    LazySegmentTree(int N, const Info& info = Info()) : LazySegmentTree(vector(N, info)) {}
+    LazySegmentTree(const vector<Info>& a) : N(a.size()), info(4 << std::__lg(N)), lazy(4 << std::__lg(N)) {
+        build(1, 0, N, a); // 左闭右开
+    }
+    void modify(int n, const Info& x) { // 单点修改
+        return update(1, 0, N, n, n + 1, x);
+    }
+    void update(int L, int R, const Lazy& x) { // 区间修改
+        if (L >= R) return;
+        return update(1, 0, N, L, R, x);
+    }
+    Info query(int L, int R) {
+        if (L >= R) return Info();
+        return query(1, 0, N, L, R);
+    }
+    template <class F>
+    int findf(int L, int R, F&& pred) { 
+        if (L >= R) return N;
+        return findf(1, 0, N, L, R, pred);
+    }
+    template <class F>
+    int findl(int L, int R, F&& pred) {
+        if (L >= R) return -1;
+        return findl(1, 0, N, L, R, pred);
+    }
+private:
+    #define lc o << 1
+    #define rc o << 1 | 1
+    #define m l + r >> 1
+    int N;
+    vector<Info> info;
+    vector<Lazy> lazy;
+    void apply(int o, const Info& x) { // 修改这个点的信息
+        info[o] = x;    
+    }
+    void apply(int o, const Lazy& x) { // 修改这个点信息，并打上标记，表示儿子节点没有被修改
+        info[o].apply(x);
+        lazy[o].apply(x);
+    }
+    void push(int o) { // 下传懒标记
+        apply(lc, lazy[o]);
+        apply(rc, lazy[o]);
+        lazy[o] = Lazy();   // 清空标记
+    }
+    void pull(int o) {
+        info[o] = info[lc] + info[rc];  // 合并子节点信息
+    }
+    void build(int o, int l, int r, const vector<Info>& a) {  // 建树
+        if (r - l == 1) return apply(o, a[l]);
+        build(lc, l, m, a);
+        build(rc, m, r, a);
+        pull(o);
+    }
+    template <class T>
+    void update(int o, int l, int r, int L, int R, const T& x) { // 区间修改
+        if (r <= L || R <= l) return;
+        if (L <= l && r <= R) return apply(o, x);
+        push(o);
+        update(lc, l, m, L, R, x);
+        update(rc, m, r, L, R, x);
+        pull(o);
+    }
+    Info query(int o, int l, int r, int L, int R) {
+        if (r <= L || R <= l) return Info();
+        if (L <= l && r <= R) return info[o];
+        push(o);
+        return query(lc, l, m, L, R) 
+             + query(rc, m, r, L, R);
+    }
+    template <class F>
+    int findf(int o, int l, int r, int L, int R, F&& pred) {
+        if (l >= R || r <= L) return N;
+        if (l >= L && r <= R && !pred(info[o])) return N;
+        if (r - l == 1) return l;
+        push(o);
+        int res = findf(lc, l, m, L, R, pred);
+        if (res == N) {
+            res = findf(rc, m, r, L, R, pred);
+        }
+        return res;
+    }
+    template <class F>
+    int findl(int o, int l, int r, int L, int R, F&& pred) {
+        if (l >= R || r <= L) return -1;
+        if (l >= L && r <= R && !pred(info[o])) return -1;
+        if (r - l == 1) return l;
+        push(o);
+        int res = findl(rc, m, r, L, R, pred);
+        if (res == -1) {
+            res = findl(lc, l, m, L, R, pred);
+        }
+        return res;
+    }
+    #undef lc
+    #undef rc
+    #undef m
+};
+
+struct Lazy { // 例子
+    i64 add{ 0 };   
+    Z po{ 1 };  
+    Z ne{ 1 };  
+    void apply(const Lazy& o)& {
+        add += o.add;
+        po *= o.po;
+        ne *= o.ne;
+    }
+};
+struct Info { // 例子
+    i64 sum{ 0 };
+    Z po{ 0 };
+    Z ne{ 0 };
+    int len{ 1 };
+    void apply(const Lazy& o)& {
+        sum += o.add * len;
+        po *= o.po;
+        ne *= o.ne;
+    }
+};
+
+Info operator + (const Info& L, const Info& R) {
+    return { L.sum + R.sum, L.po + R.po, L.ne + R.ne, L.len + R.len };
+}
+
+struct DSU { // 简单的一个并查集类
+    std::vector<int> f;
+    std::vector<int> size;
+ 
+    DSU(int n) : f(n), size(n) {
+        std::iota(f.begin(), f.end(), 0);
+        std::fill(size.begin(), size.end(), 1);
+    }
+ 
+    int find(int x) { // 路径压缩
+        while (x != f[x])
+            x = f[x] = f[f[x]];
+        return x;
+    }
+ 
+    void Union(int x, int y) {
+        if (find(x) == find(y))
+            return;
+        if (size[x] < size[y]) // 按秩合并
+            std::swap(x, y);
+ 
+        size[find(x)] += size[find(y)];
+        f[find(y)] = find(x);
+    }
+};
+
+constexpr int maxN = 4e5;
 int main() {
-    int n, m; std::cin >> n >> m;
-    Poly a, b; a.resize(n + 1); b.resize(m + 1);
-    for (int i = 0; i <= n; i++) {
-        std::cin >> a[i];
+    cin.tie(nullptr)->sync_with_stdio(false);
+    
+    Z po = u64(rnd());
+    Z ne = 1 / po;
+
+    vector<Z> powpo(maxN + 1), powne(maxN + 1);
+    powpo[0] = 1;
+    powne[0] = 1;
+    for (auto i = 0; i < maxN; i++) {
+        powpo[i + 1] = powpo[i] * po;
+        powne[i + 1] = powne[i] * ne;
     }
-    for (int i = 0; i <= m; i++) {
-        std::cin >> b[i];
+
+    int N, Q;
+    cin >> N >> Q;
+
+    vector<Info> a(N);
+    for (auto n = 0; n < N; n++) {
+        int x;
+        cin >> x;
+        x *= 2;
+        a[n] = { x, powpo[x], powne[x], 1 };
     }
-    Poly c = a / b;
-    c.resize(n - m + 1);
-    for (int i = 0; i <= n - m; i++) {
-        std::cout << c[i] << " \n"[i == n - m];
+    LazySegmentTree<Info, Lazy> seg(a);
+
+    while (Q--) {
+        int op;
+        cin >> op;
+        
+        if (op == 1) {
+            int L, R, v;
+            cin >> L >> R >> v;
+            L--;
+            v *= 2;
+            seg.update(L, R, { v, powpo[v], powne[v] });
+        } else {
+            int L, R;
+            cin >> L >> R;
+            L--;
+
+            auto [sum, pores, neres, _] = seg.query(L, R);
+            auto c = sum / (R - L);
+
+            pores *= qpow(ne, c);
+            neres *= qpow(po, c);
+
+            cout << (pores.val() == neres.val() ? "YES" : "NO") << "\n";
+        }
     }
-    auto d = a % b;
-    d.resize(m);
-    for (int i = 0; i < m; i++) {
-        std::cout << d[i] << " \n"[i == m - 1];
-    }
+    
     return 0;
 }
